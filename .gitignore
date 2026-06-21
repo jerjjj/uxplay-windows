@@ -1,0 +1,19 @@
+# Build output
+bin/
+obj/
+Output/
+libuxplay/build/
+
+# IDE
+.vs/
+.idea/
+*.user
+*.suo
+
+# Tools
+.reasonix/
+
+# Temp
+*.log
+dotnet-install.ps1
+dotnet8-sdk.*
