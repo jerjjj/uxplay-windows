@@ -49,18 +49,19 @@ if (-not $SkipNative) {
 }
 
 # ── 2. 构建 .NET 客户端 ──
-Write-Host "`n> dotnet build -c $Config" -ForegroundColor Yellow
-& $dotnet build -c $Config
+$Platform = ($Runtime -replace '^win-','')
+Write-Host "`n> dotnet build -c $Config -p:Platform=$Platform" -ForegroundColor Yellow
+& $dotnet build -c $Config -p:Platform=$Platform
 if ($LASTEXITCODE -ne 0) { Write-Error "dotnet build 失败"; exit 1 }
 
 # ── 3. 发布 ──
 if ($Publish -or $Installer) {
     Write-Host "`n> dotnet publish -r $Runtime -c $Config --self-contained" -ForegroundColor Yellow
-    & $dotnet publish -r $Runtime -c $Config --self-contained
+    & $dotnet publish -r $Runtime -c $Config -p:Platform=$Platform --self-contained
     if ($LASTEXITCODE -ne 0) { Write-Error "dotnet publish 失败"; exit 1 }
-    $pubDir = "$Root\bin\$Config\net10.0-windows10.0.22621.0\$Runtime\publish"
+    $pubDir = "$Root\bin\$Platform\$Config\net10.0-windows10.0.22621.0\$Runtime\publish"
     $files = (Get-ChildItem $pubDir -Recurse -File).Count
-    Write-Host "  Published $files files → $pubDir" -ForegroundColor Green
+    Write-Host "  Published $files files -> $pubDir" -ForegroundColor Green
 }
 
 # ── 4. 安装程序 ──

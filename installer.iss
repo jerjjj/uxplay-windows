@@ -10,7 +10,7 @@
 ; ====================================================
 
 #ifndef PublishDir
-  #define PublishDir "bin\Release\net10.0-windows10.0.22621.0\win-x64\publish"
+  #define PublishDir "bin\x64\Release\net10.0-windows10.0.22621.0\win-x64\publish"
 #endif
 #ifndef AppVersion
   #define AppVersion "1.0.0"
@@ -37,8 +37,18 @@ LicenseFile=
 DisableProgramGroupPage=yes
 
 [Languages]
-Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
+
+[Messages]
+; Chinese overrides for key installer UI strings
+WelcomeLabel1=欢迎安装 UxPlay Client
+WelcomeLabel2=这将在您的计算机上安装 UxPlay Client {#AppVersion}。%n%n建议关闭所有其他应用程序后再继续。
+SelectDirLabel3=安装程序将把 UxPlay Client 安装到以下文件夹。
+ReadyLabel1=安装程序已准备好将 UxPlay Client 安装到您的计算机。
+FinishedLabel=UxPlay Client 已成功安装。
+ButtonNext=下一步(&N) >
+ButtonInstall=安装(&I)
+ButtonFinish=完成(&F)
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
