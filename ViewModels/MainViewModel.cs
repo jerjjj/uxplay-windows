@@ -38,10 +38,10 @@ public partial class MainViewModel : ObservableObject
         svc.StateChanged       += (_, s) => { ApplyState(s); if (!_userStopping && s == UxPlayState.Idle) { Log("投屏窗口已关闭，自动重启中…"); _ = AutoRestart(); } };
         svc.ClientConnected    += (_, _) => { ConnectionCount = svc.GetConnectionCount(); };
         svc.ClientDisconnected += (_, _) => { ConnectionCount = svc.GetConnectionCount(); if (ConnectionCount == 0) ConnectedDevices.Clear(); };
-        svc.ClientInfo         += (_, c) => { ConnectedDevices.Clear(); ConnectedDevices.Add($"{c.name} ({c.model})"); Log($"设备连接: {c.name} ({c.model}) ID={c.id}"); };
-        svc.PinDisplayed       += (_, p) => { PinCode = p; PinVisible = true; Log($"PIN 码: {p}"); };
-        svc.MirrorStarted      += (_, _) => Log("屏幕镜像已开始");
-        svc.MirrorStopped      += (_, _) => Log("屏幕镜像已停止");
+        svc.ClientInfo         += (_, c) => { ConnectedDevices.Clear(); ConnectedDevices.Add($"{c.name} ({c.model})"); Log($"{L10n.Get("log.device_connected")}: {c.name} ({c.model}) ID={c.id}"); };
+        svc.PinDisplayed       += (_, p) => { PinCode = p; PinVisible = true; Log($"{L10n.Get("log.pin")}: {p}"); };
+        svc.MirrorStarted      += (_, _) => Log(L10n.Get("log.mirror_started"));
+        svc.MirrorStopped      += (_, _) => Log(L10n.Get("log.mirror_stopped"));
         svc.AudioMetadata      += (_, m) => { AudioArtist = m.artist ?? ""; AudioTitle = m.title ?? ""; AudioMetaVisible = !string.IsNullOrEmpty(m.title); };
         svc.ErrorOccurred      += (_, m) => { ErrorMessage = m; Log($"[ERROR] {m}"); };
         svc.LogMessage         += (_, m) => Log(m);

@@ -50,6 +50,8 @@ public class AppSettings
     public bool RestrictClients { get; set; }
     public bool NewWindowClosing { get; set; }
     public bool ShowFpsData { get; set; }
+    public string Language { get; set; } = "zh-CN";
+    public Services.AppTheme Theme { get; set; } = Services.AppTheme.System;
 
     public UxPlayConfig ToNativeConfig()
     {

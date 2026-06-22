@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Shapes;
+using UxPlayClient.Services;
 using UxPlayClient.ViewModels;
 
 namespace UxPlayClient.Pages;
@@ -38,13 +39,13 @@ public class MainPage : Page
         statusRow.Children.Add(_statusText);
 
         // ── 按钮 ──
-        _startBtn = UI.AccentBtn("启用投屏");
+        _startBtn = UI.AccentBtn(L10n.Get("ctrl.start"));
         _startBtn.Command = vm.StartCommand;
-        _stopBtn = UI.Btn("关闭投屏");
+        _stopBtn = UI.Btn(L10n.Get("ctrl.stop"));
         _stopBtn.Command = vm.StopCommand;
-        var restartBtn = UI.Btn("重启投屏");
+        var restartBtn = UI.Btn(L10n.Get("ctrl.restart"));
         restartBtn.Command = vm.RestartCommand;
-        _disconnBtn = UI.Btn("断开连接");
+        _disconnBtn = UI.Btn(L10n.Get("ctrl.disconnect"));
         _disconnBtn.Command = vm.DisconnectAllCommand;
 
         var btns = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
@@ -76,10 +77,8 @@ public class MainPage : Page
             Margin = new Thickness(0, 8, 0, 8),
             CharacterSpacing = 200,
         };
-        _pinCard = UI.Card(
-            UI.Title("访问 PIN 码"),
-            _pinCodeText,
-            new TextBlock { Text = "请在 iOS / macOS 设备上输入此 PIN 码",
+        _pinCard = UI.Card(UI.Title(L10n.Get("pin.title")), _pinCodeText,
+            new TextBlock { Text = L10n.Get("pin.hint"),
                 Foreground = UI.Res("TextFillColorSecondaryBrush"),
                 HorizontalAlignment = HorizontalAlignment.Center });
         _pinCard.Visibility = Visibility.Collapsed;
@@ -87,7 +86,7 @@ public class MainPage : Page
         // ── 音频 ──
         _audioTitleText = new TextBlock { FontSize = 16, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold };
         _audioArtistText = new TextBlock { Foreground = UI.Res("TextFillColorSecondaryBrush") };
-        _audioCard = UI.Card(UI.Title("正在播放"), _audioTitleText, _audioArtistText);
+        _audioCard = UI.Card(UI.Title(L10n.Get("audio.title")), _audioTitleText, _audioArtistText);
         _audioCard.Visibility = Visibility.Collapsed;
 
         // ── 设备列表 ──
@@ -100,7 +99,7 @@ public class MainPage : Page
         };
         _noDeviceText = new TextBlock
         {
-            Text = "暂无设备连接",
+            Text = L10n.Get("devices.none"),
             Foreground = UI.Res("TextFillColorSecondaryBrush"),
             HorizontalAlignment = HorizontalAlignment.Center,
             Margin = new Thickness(0, 12, 0, 12),
@@ -108,7 +107,7 @@ public class MainPage : Page
 
         // ── 错误 InfoBar ──
         _errorBar = UI.MakeInfoBar(InfoBarSeverity.Error);
-        _errorBar.Title = "错误";
+        _errorBar.Title = L10n.Get("error.title");
 
         // ── 组装 ──
         Content = new ScrollViewer
@@ -120,11 +119,11 @@ public class MainPage : Page
                 Spacing = 16, MaxWidth = 720, HorizontalAlignment = HorizontalAlignment.Center,
                 Children =
                 {
-                    UI.Card(statusRow, _connText),
-                    UI.Card(UI.Title("投屏控制"), btns, volGrid),
+                    UI.Card(UI.Title(L10n.Get("status.title")), statusRow, _connText),
+                    UI.Card(UI.Title(L10n.Get("ctrl.title")), btns, volGrid),
                     _pinCard,
                     _audioCard,
-                    UI.Card(UI.Title("已连接设备"), _deviceList, _noDeviceText),
+                    UI.Card(UI.Title(L10n.Get("devices.title")), _deviceList, _noDeviceText),
                     _errorBar,
                 }
             }
@@ -147,7 +146,7 @@ public class MainPage : Page
             _statusDot.Fill = UI.StatusDot(_vm.StatusColor).Fill;
         }
         if (prop is null or nameof(MainViewModel.ConnectionCount))
-            _connText.Text = $"连接数  {_vm.ConnectionCount}";
+            _connText.Text = $"{L10n.Get("status.connections")}  {_vm.ConnectionCount}";
         if (prop is null or nameof(MainViewModel.PinVisible) or nameof(MainViewModel.PinCode))
         {
             _pinCard.Visibility = _vm.PinVisible ? Visibility.Visible : Visibility.Collapsed;

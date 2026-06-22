@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using UxPlayClient.Services;
 using UxPlayClient.ViewModels;
 
 namespace UxPlayClient.Pages;
@@ -20,7 +21,7 @@ public class SettingsPage : Page
     {
         _vm = vm;
         _statusBar = UI.MakeInfoBar(InfoBarSeverity.Success);
-        _statusBar.Title = "设置";
+        _statusBar.Title = L10n.Get("settings.title");
 
         // ── 身份标识 ──
         var g1 = UI.SettingsGrid(3);
@@ -108,7 +109,7 @@ public class SettingsPage : Page
             desc: "仅允许通过 -allow 指定的设备连接（-restrict）");
 
         // ── 杂项 ──
-        var g7 = UI.SettingsGrid(8);
+        var g7 = UI.SettingsGrid(10);
         Cmb(g7, 0, "日志级别", vm.LogLevelOptions, vm.LogLevelIndex, v => vm.LogLevelIndex = v,
             desc: "调试级别显示完整协议通信细节（-d）");
         Tog(g7, 1, "允许踢人", vm.NoHold, v => vm.NoHold = v,
@@ -126,6 +127,10 @@ public class SettingsPage : Page
             desc: "在日志中显示客户端发送的视频流性能报告（-FPSdata）");
         Tog(g7, 7, "新窗口关闭", vm.NewWindowClosing, v => vm.NewWindowClosing = v,
             desc: "客户端停止镜像时关闭视频窗口（-nc 取消此行为）");
+        Cmb(g7, 8, "界面语言", vm.LanguageOptions, vm.LanguageIndex, v =>
+            { vm.LanguageIndex = v; L10n.SetLanguage(v == 0 ? "en" : "zh-CN"); });
+        Cmb(g7, 9, "主题", vm.ThemeOptions, vm.ThemeIndex, v =>
+            { vm.ThemeIndex = v; L10n.SetTheme((AppTheme)v); });
 
         // ── 按钮 ──
         var btnReset = UI.Btn("恢复默认"); btnReset.Command = vm.ResetDefaultsCommand;

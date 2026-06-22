@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using UxPlayClient.Services;
 using UxPlayClient.ViewModels;
 
 namespace UxPlayClient.Pages;
@@ -18,7 +19,7 @@ public class LogPage : Page
             IsTextSelectionEnabled = true,
         };
 
-        var clearBtn = UI.Btn("清空日志");
+        var clearBtn = UI.Btn(L10n.Get("log.clear"));
         clearBtn.Command = vm.ClearLogCommand;
         clearBtn.HorizontalAlignment = HorizontalAlignment.Right;
         clearBtn.Margin = new Thickness(0, 12, 0, 0);

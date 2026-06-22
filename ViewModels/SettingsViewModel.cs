@@ -39,6 +39,8 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] int _logLevelIndex = 2;
     [ObservableProperty] bool _hlsSupport, _noHold = true, _coverartDisplay, _showFpsData, _newWindowClosing;
     [ObservableProperty] string _coverartFilename = "", _lang = "";
+    [ObservableProperty] int _languageIndex = 1; // default zh-CN
+    [ObservableProperty] int _themeIndex = 0;    // default System
 
     // ── UI 状态 ──
     [ObservableProperty] string _statusMessage = "";
@@ -47,6 +49,8 @@ public partial class SettingsViewModel : ObservableObject
     public string[] VideoFlipOptions { get; } = ["无", "左旋90°", "右旋90°", "旋转180°", "垂直翻转", "水平翻转"];
     public string[] AccessControlOptions { get; } = ["无认证", "PIN 码", "密码"];
     public string[] LogLevelOptions { get; } = ["错误", "警告", "信息", "调试", "详细"];
+    public string[] LanguageOptions { get; } = ["English", "简体中文"];
+    public string[] ThemeOptions { get; } = ["跟随系统", "浅色", "深色"];
 
     public void LoadSettings()
     {
@@ -70,6 +74,8 @@ public partial class SettingsViewModel : ObservableObject
         HlsSupport = s.HlsSupport; NoHold = s.NoHold;
         CoverartDisplay = s.CoverartDisplay; CoverartFilename = s.CoverartFilename ?? "";
         ShowFpsData = s.ShowFpsData; NewWindowClosing = s.NewWindowClosing; Lang = s.Lang ?? "";
+        LanguageIndex = (s.Language == "en") ? 0 : 1;
+        ThemeIndex = (int)s.Theme;
         IsDirty = false; StatusMessage = "";
     }
 
@@ -101,6 +107,8 @@ public partial class SettingsViewModel : ObservableObject
         CoverartFilename = string.IsNullOrWhiteSpace(CoverartFilename) ? null : CoverartFilename,
         ShowFpsData = ShowFpsData, NewWindowClosing = NewWindowClosing,
         Lang = string.IsNullOrWhiteSpace(Lang) ? null : Lang,
+        Language = (LanguageIndex == 0) ? "en" : "zh-CN",
+        Theme = (Services.AppTheme)ThemeIndex,
     };
 
     [RelayCommand] void SaveSettings() { if (Build().Save()) { IsDirty = false; StatusMessage = "设置已保存，重启投屏后生效"; } else StatusMessage = "保存失败"; }
@@ -121,6 +129,7 @@ public partial class SettingsViewModel : ObservableObject
         LogLevelIndex = 2; HlsSupport = d.HlsSupport; NoHold = d.NoHold;
         CoverartDisplay = d.CoverartDisplay; CoverartFilename = "";
         ShowFpsData = d.ShowFpsData; NewWindowClosing = d.NewWindowClosing; Lang = "";
+        LanguageIndex = 1; ThemeIndex = 0;
         IsDirty = true; StatusMessage = "已恢复默认设置";
     }
 }

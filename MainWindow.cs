@@ -45,17 +45,17 @@ public class MainWindow : Window
             Header = _headerText,
         };
 
-        _nav.MenuItems.Add(new NavigationViewItem { Content = "主页", Tag = "Home", Icon = new SymbolIcon(Symbol.Home) });
-        _nav.MenuItems.Add(new NavigationViewItem { Content = "设置", Tag = "Settings", Icon = new SymbolIcon(Symbol.Setting) });
-        _nav.MenuItems.Add(new NavigationViewItem { Content = "日志", Tag = "Log", Icon = new SymbolIcon(Symbol.List) });
+        _nav.MenuItems.Add(new NavigationViewItem { Content = L10n.Get("nav.home"), Tag = "Home", Icon = new SymbolIcon(Symbol.Home) });
+        _nav.MenuItems.Add(new NavigationViewItem { Content = L10n.Get("nav.settings"), Tag = "Settings", Icon = new SymbolIcon(Symbol.Setting) });
+        _nav.MenuItems.Add(new NavigationViewItem { Content = L10n.Get("nav.log"), Tag = "Log", Icon = new SymbolIcon(Symbol.List) });
 
         _nav.PaneFooter = new StackPanel
         {
             Padding = new Thickness(12, 8, 12, 8),
             Children = {
-                new TextBlock { Text = "UxPlay Client", FontWeight = Microsoft.UI.Text.FontWeights.Bold,
+                new TextBlock { Text = L10n.Get("app.title"), FontWeight = Microsoft.UI.Text.FontWeights.Bold,
                     FontSize = 13, Opacity = 0.7 },
-                new TextBlock { Text = "v1.0.0", FontSize = 11, Opacity = 0.4,
+                new TextBlock { Text = L10n.Get("app.version"), FontSize = 11, Opacity = 0.4,
                     Margin = new Thickness(0, 2, 0, 0) },
             }
         };
@@ -97,10 +97,10 @@ public class MainWindow : Window
     {
         (_nav.Content, _headerText.Text) = tag switch
         {
-            "Home"     => ((object)new MainPage(_mainVm!), "主页"),
-            "Settings" => (new SettingsPage(_settingsVm!), "设置"),
-            "Log"      => (new LogPage(_mainVm!), "日志"),
-            _          => (new MainPage(_mainVm!), "主页"),
+            "Home"     => ((object)new MainPage(_mainVm!), L10n.Get("heading.home")),
+            "Settings" => (new SettingsPage(_settingsVm!), L10n.Get("heading.settings")),
+            "Log"      => (new LogPage(_mainVm!), L10n.Get("heading.log")),
+            _          => (new MainPage(_mainVm!), L10n.Get("heading.home")),
         };
     }
 }
