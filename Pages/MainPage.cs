@@ -72,20 +72,20 @@ public class MainPage : Page
         {
             FontSize = 42,
             FontWeight = Microsoft.UI.Text.FontWeights.Bold,
-            Foreground = UI.Res("AccentTextFillColorPrimaryBrush"),
+            Foreground = UI.AccentText,
             HorizontalAlignment = HorizontalAlignment.Center,
             Margin = new Thickness(0, 8, 0, 8),
             CharacterSpacing = 200,
         };
         _pinCard = UI.Card(UI.Title(L10n.Get("pin.title")), _pinCodeText,
             new TextBlock { Text = L10n.Get("pin.hint"),
-                Foreground = UI.Res("TextFillColorSecondaryBrush"),
+                Foreground = UI.TextSecondary,
                 HorizontalAlignment = HorizontalAlignment.Center });
         _pinCard.Visibility = Visibility.Collapsed;
 
         // ── 音频 ──
         _audioTitleText = new TextBlock { FontSize = 16, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold };
-        _audioArtistText = new TextBlock { Foreground = UI.Res("TextFillColorSecondaryBrush") };
+        _audioArtistText = new TextBlock { Foreground = UI.TextSecondary };
         _audioCard = UI.Card(UI.Title(L10n.Get("audio.title")), _audioTitleText, _audioArtistText);
         _audioCard.Visibility = Visibility.Collapsed;
 
@@ -100,7 +100,7 @@ public class MainPage : Page
         _noDeviceText = new TextBlock
         {
             Text = L10n.Get("devices.none"),
-            Foreground = UI.Res("TextFillColorSecondaryBrush"),
+            Foreground = UI.TextSecondary,
             HorizontalAlignment = HorizontalAlignment.Center,
             Margin = new Thickness(0, 12, 0, 12),
         };

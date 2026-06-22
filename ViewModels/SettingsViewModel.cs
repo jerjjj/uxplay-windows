@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using UxPlayClient.Interop;
 using UxPlayClient.Models;
+using UxPlayClient.Services;
 
 namespace UxPlayClient.ViewModels;
 
@@ -46,11 +47,11 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] string _statusMessage = "";
     [ObservableProperty] bool _isDirty;
 
-    public string[] VideoFlipOptions { get; } = ["无", "左旋90°", "右旋90°", "旋转180°", "垂直翻转", "水平翻转"];
-    public string[] AccessControlOptions { get; } = ["无认证", "PIN 码", "密码"];
-    public string[] LogLevelOptions { get; } = ["错误", "警告", "信息", "调试", "详细"];
-    public string[] LanguageOptions { get; } = ["English", "简体中文"];
-    public string[] ThemeOptions { get; } = ["跟随系统", "浅色", "深色"];
+    public string[] VideoFlipOptions => [L10n.Get("flip.none"), L10n.Get("flip.left"), L10n.Get("flip.right"), L10n.Get("flip.invert"), L10n.Get("flip.vflip"), L10n.Get("flip.hflip")];
+    public string[] AccessControlOptions => [L10n.Get("access.free"), L10n.Get("access.pin"), L10n.Get("access.password")];
+    public string[] LogLevelOptions => [L10n.Get("log.level.error"), L10n.Get("log.level.warning"), L10n.Get("log.level.info"), L10n.Get("log.level.debug"), L10n.Get("log.level.verbose")];
+    public string[] LanguageOptions => [L10n.Get("lang.en"), L10n.Get("lang.zh-CN")];
+    public string[] ThemeOptions => [L10n.Get("theme.system"), L10n.Get("theme.light"), L10n.Get("theme.dark")];
 
     public void LoadSettings()
     {
@@ -111,7 +112,7 @@ public partial class SettingsViewModel : ObservableObject
         Theme = (Services.AppTheme)ThemeIndex,
     };
 
-    [RelayCommand] void SaveSettings() { if (Build().Save()) { IsDirty = false; StatusMessage = "设置已保存，重启投屏后生效"; } else StatusMessage = "保存失败"; }
+    [RelayCommand] void SaveSettings() { if (Build().Save()) { IsDirty = false; StatusMessage = L10n.Get("settings.saved"); } else StatusMessage = L10n.Get("settings.save_failed"); }
 
     [RelayCommand] void ResetDefaults()
     {
@@ -130,6 +131,6 @@ public partial class SettingsViewModel : ObservableObject
         CoverartDisplay = d.CoverartDisplay; CoverartFilename = "";
         ShowFpsData = d.ShowFpsData; NewWindowClosing = d.NewWindowClosing; Lang = "";
         LanguageIndex = 1; ThemeIndex = 0;
-        IsDirty = true; StatusMessage = "已恢复默认设置";
+        IsDirty = true; StatusMessage = L10n.Get("msg.settings_reset");
     }
 }

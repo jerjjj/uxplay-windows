@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Package.appxmanifest.sample — 模板文件（提交到 GitHub）
+
+  使用方法:
+    复制此文件为 Package.appxmanifest，填入你的 Publisher ID。
+    Package.appxmanifest 已被 .gitignore 排除，不会提交到 GitHub。
+    build.ps1 会自动从 .sample 复制。
+-->
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+         xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+         xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
+         IgnorableNamespaces="uap rescap uap3">
+
+  <Identity Name="UxPlayClient"
+            Publisher="CN=YourPublisherId"
+            Version="1.1.0.0" />
+
+  <Properties>
+    <DisplayName>UxPlayClient</DisplayName>
+    <PublisherDisplayName>YourName</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+    <Description>AirPlay mirroring and audio streaming receiver for Windows</Description>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.22621.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.22621.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="x-generate" />
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+                 Executable="UxPlayClient.exe"
+                 EntryPoint="UxPlayClient.App">
+      <uap:VisualElements
+          DisplayName="UxPlayClient"
+          Description="AirPlay receiver for Windows"
+          BackgroundColor="#0EA5E9"
+          Square150x150Logo="Assets\Square150x150Logo.png"
+          Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
+        <uap:SplashScreen Image="Assets\SplashScreen.png" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <Capability Name="internetClient" />
+    <Capability Name="privateNetworkClientServer" />
+  </Capabilities>
+</Package>

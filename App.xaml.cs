@@ -6,24 +6,19 @@ namespace UxPlayClient;
 
 public partial class App : Application
 {
-    private Window? _window;
-
     public App()
     {
         InitializeComponent();
         L10n.LoadSavedLanguage();
-        ApplyTheme();
-        L10n.ThemeChanged += t => ApplyTheme();
-    }
 
-    void ApplyTheme()
-    {
-        RequestedTheme = L10n.Theme switch
-        {
-            AppTheme.Light  => ApplicationTheme.Light,
-            AppTheme.Dark   => ApplicationTheme.Dark,
-            _               => ApplicationTheme.Dark // still respect system; Framework handles switch
-        };
+        // Apply theme at STARTUP only (API doesn't support runtime changes)
+        var t = L10n.Theme;
+        UI.IsDark = t == AppTheme.Dark;
+        if (t == AppTheme.Light)
+            RequestedTheme = ApplicationTheme.Light;
+        else if (t == AppTheme.Dark)
+            RequestedTheme = ApplicationTheme.Dark;
+        // System: don't touch — WinUI follows OS
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
@@ -32,7 +27,10 @@ public partial class App : Application
         if (!File.Exists(dllPath))
             System.Diagnostics.Debug.WriteLine($"[WARN] libuxplaylib.dll not found at {dllPath}");
 
-        _window = new MainWindow();
-        _window.Activate();
+        var window = new MainWindow();
+        _window = window;
+        window.Activate();
     }
+
+    private Window? _window;
 }

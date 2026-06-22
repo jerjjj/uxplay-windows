@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0EA5E9"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <!-- Screen rectangle -->
+  <rect x="32" y="16" width="192" height="168" rx="42" fill="url(#bg)" filter="url(#shadow)"/>
+  <!-- Casting arcs (WiFi symbol) -->
+  <g transform="translate(176, 196)" stroke="white" stroke-width="7" fill="none" stroke-linecap="round" opacity="0.9">
+    <path d="M -44,0 A 44,44 0 0,1 0,0" />
+    <path d="M -30,0 A 30,30 0 0,1 0,0" />
+    <path d="M -16,0 A 16,16 0 0,1 0,0" />
+    <circle cx="0" cy="0" r="6" fill="white"/>
+  </g>
+</svg>

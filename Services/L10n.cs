@@ -14,7 +14,7 @@ public static class L10n
     static readonly Dictionary<string, string> _en = new()
     {
         ["app.title"] = "UxPlay Client",
-        ["app.version"] = "v1.0.0",
+        ["app.version"] = "v1.1.0",
         ["nav.home"] = "Home",
         ["nav.settings"] = "Settings",
         ["nav.log"] = "Log",
@@ -168,12 +168,47 @@ public static class L10n
         ["log.stop_failed"] = "Stop failed",
         ["log.restart_failed"] = "Restart failed",
         ["log.dll_not_found"] = "libuxplaylib.dll not found! Please build libuxplay first.",
+
+        // Placeholders
+        ["placeholder.mac"] = "Leave blank to auto-detect",
+        ["placeholder.password"] = "Leave blank for no password",
+        ["placeholder.keyfile"] = "Leave blank for default",
+        ["placeholder.lang"] = "e.g. fr:es:en",
+        ["placeholder.coverart"] = "e.g. cover.jpg",
+
+        // Flip / Access / Log options
+        ["flip.none"] = "None",
+        ["flip.left"] = "Rotate Left 90°",
+        ["flip.right"] = "Rotate Right 90°",
+        ["flip.invert"] = "Rotate 180°",
+        ["flip.vflip"] = "Flip Vertical",
+        ["flip.hflip"] = "Flip Horizontal",
+
+        ["access.free"] = "No Auth",
+        ["access.pin"] = "PIN Code",
+        ["access.password"] = "Password",
+
+        ["log.level.error"] = "Error",
+        ["log.level.warning"] = "Warning",
+        ["log.level.info"] = "Info",
+        ["log.level.debug"] = "Debug",
+        ["log.level.verbose"] = "Verbose",
+
+        ["theme.restart_title"] = "Restart Required",
+        ["theme.restart_msg"] = "Theme changes require an app restart to take full effect. Restart now?",
+        ["theme.restart_now"] = "Restart Now",
+        ["theme.restart_later"] = "Later",
+
+        ["msg.start_failed"] = "Start failed",
+        ["msg.stop_failed"] = "Stop failed",
+        ["msg.restart_failed"] = "Restart failed",
+        ["msg.settings_reset"] = "Restored default settings",
     };
 
     static readonly Dictionary<string, string> _zh = new()
     {
         ["app.title"] = "UxPlay Client",
-        ["app.version"] = "v1.0.0",
+        ["app.version"] = "v1.1.0",
         ["nav.home"] = "主页",
         ["nav.settings"] = "设置",
         ["nav.log"] = "日志",
@@ -326,6 +361,41 @@ public static class L10n
         ["log.stop_failed"] = "停止失败",
         ["log.restart_failed"] = "重启失败",
         ["log.dll_not_found"] = "libuxplaylib.dll 未找到！请先构建 libuxplay。",
+
+        // Placeholders
+        ["placeholder.mac"] = "留空自动检测",
+        ["placeholder.password"] = "留空则无密码",
+        ["placeholder.keyfile"] = "留空使用默认",
+        ["placeholder.lang"] = "如 fr:es:en",
+        ["placeholder.coverart"] = "如 cover.jpg",
+
+        // Flip / Access / Log options
+        ["flip.none"] = "无",
+        ["flip.left"] = "左旋90°",
+        ["flip.right"] = "右旋90°",
+        ["flip.invert"] = "旋转180°",
+        ["flip.vflip"] = "垂直翻转",
+        ["flip.hflip"] = "水平翻转",
+
+        ["access.free"] = "无认证",
+        ["access.pin"] = "PIN 码",
+        ["access.password"] = "密码",
+
+        ["log.level.error"] = "错误",
+        ["log.level.warning"] = "警告",
+        ["log.level.info"] = "信息",
+        ["log.level.debug"] = "调试",
+        ["log.level.verbose"] = "详细",
+
+        ["theme.restart_title"] = "需要重启",
+        ["theme.restart_msg"] = "主题变更需要重启应用才能完全生效。是否立即重启？",
+        ["theme.restart_now"] = "立即重启",
+        ["theme.restart_later"] = "稍后",
+
+        ["msg.start_failed"] = "启动失败",
+        ["msg.stop_failed"] = "停止失败",
+        ["msg.restart_failed"] = "重启失败",
+        ["msg.settings_reset"] = "已恢复默认设置",
     };
 
     static Dictionary<string, string> _cur = _zh;

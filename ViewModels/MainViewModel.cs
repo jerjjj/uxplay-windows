@@ -17,7 +17,7 @@ public partial class MainViewModel : ObservableObject
     private readonly StringBuilder _logBuf = new(4096);
     private bool _userStopping;
 
-    [ObservableProperty] string _statusText = "空闲";
+    [ObservableProperty] string _statusText = L10n.Get("status.idle");
     [ObservableProperty] string _statusColor = "Gray";
     [ObservableProperty] bool _isRunning, _isStarting;
     [ObservableProperty] int _connectionCount;
@@ -31,11 +31,15 @@ public partial class MainViewModel : ObservableObject
 
     public ObservableCollection<string> ConnectedDevices { get; } = new();
 
+    private UxPlayState _currentState;
+
     public MainViewModel(UxPlayService svc, DispatcherQueue dq)
     {
         _svc = svc;
 
-        svc.StateChanged       += (_, s) => { ApplyState(s); if (!_userStopping && s == UxPlayState.Idle) { Log("投屏窗口已关闭，自动重启中…"); _ = AutoRestart(); } };
+        L10n.LanguageChanged += () => { if (_svc is not null) ApplyState(_currentState); };
+
+        svc.StateChanged       += (_, s) => { ApplyState(s); if (!_userStopping && s == UxPlayState.Idle) { Log(L10n.Get("log.auto_restart")); _ = AutoRestart(); } };
         svc.ClientConnected    += (_, _) => { ConnectionCount = svc.GetConnectionCount(); };
         svc.ClientDisconnected += (_, _) => { ConnectionCount = svc.GetConnectionCount(); if (ConnectionCount == 0) ConnectedDevices.Clear(); };
         svc.ClientInfo         += (_, c) => { ConnectedDevices.Clear(); ConnectedDevices.Add($"{c.name} ({c.model})"); Log($"{L10n.Get("log.device_connected")}: {c.name} ({c.model}) ID={c.id}"); };
@@ -51,14 +55,15 @@ public partial class MainViewModel : ObservableObject
 
     void ApplyState(UxPlayState s)
     {
+        _currentState = s;
         (StatusText, StatusColor, IsRunning, IsStarting) = s switch
         {
-            UxPlayState.Idle     => ("空闲",     "Gray",   false, false),
-            UxPlayState.Starting => ("启动中...", "Orange", false, true),
-            UxPlayState.Running  => ("运行中",   "Green",  true,  false),
-            UxPlayState.Stopping => ("停止中...", "Orange", false, true),
-            UxPlayState.Error    => ("错误",     "Red",    false, false),
-            _ => ("未知", "Gray", false, false),
+            UxPlayState.Idle     => (L10n.Get("status.idle"),     "Gray",   false, false),
+            UxPlayState.Starting => (L10n.Get("status.starting"), "Orange", false, true),
+            UxPlayState.Running  => (L10n.Get("status.running"),  "Green",  true,  false),
+            UxPlayState.Stopping => (L10n.Get("status.stopping"), "Orange", false, true),
+            UxPlayState.Error    => (L10n.Get("status.error"),    "Red",    false, false),
+            _ => (L10n.Get("status.unknown"), "Gray", false, false),
         };
         NotifyCommands();
         if (s is UxPlayState.Idle or UxPlayState.Error)
@@ -98,7 +103,7 @@ public partial class MainViewModel : ObservableObject
         _userStopping = false;
         ErrorMessage = "";
         try { await DoStart(); }
-        catch (Exception ex) { ErrorMessage = $"启动失败: {ex.Message}"; Log($"[ERROR] {ex.Message}"); }
+        catch (Exception ex) { ErrorMessage = $"{L10n.Get("msg.start_failed")}: {ex.Message}"; Log($"[ERROR] {ex.Message}"); }
     }
     bool CanStart => !IsRunning && !IsStarting;
 
@@ -107,7 +112,7 @@ public partial class MainViewModel : ObservableObject
     {
         _userStopping = true;
         try { await _svc.StopAsync(); ConnectionCount = 0; ConnectedDevices.Clear(); }
-        catch (Exception ex) { ErrorMessage = $"停止失败: {ex.Message}"; }
+        catch (Exception ex) { ErrorMessage = $"{L10n.Get("msg.stop_failed")}: {ex.Message}"; }
     }
     bool CanStop => IsRunning || IsStarting;
 
@@ -115,7 +120,7 @@ public partial class MainViewModel : ObservableObject
     async Task Restart()
     {
         _userStopping = true;
-        Log("正在重启投屏…");
+        Log(L10n.Get("log.restart"));
         try
         {
             await _svc.StopAsync();
@@ -123,9 +128,9 @@ public partial class MainViewModel : ObservableObject
             await Task.Delay(500);
             _userStopping = false;
             await DoStart();
-            Log("投屏已重启，新设置已生效");
+            Log(L10n.Get("log.restart_ok"));
         }
-        catch (Exception ex) { ErrorMessage = $"重启失败: {ex.Message}"; Log($"[ERROR] {ex.Message}"); }
+        catch (Exception ex) { ErrorMessage = $"{L10n.Get("msg.restart_failed")}: {ex.Message}"; Log($"[ERROR] {ex.Message}"); }
     }
 
     async Task AutoRestart()
@@ -135,14 +140,14 @@ public partial class MainViewModel : ObservableObject
             await Task.Delay(1000);
             if (_userStopping || IsRunning) return;
             await DoStart();
-            Log("自动重启完成，等待新连接");
+            Log(L10n.Get("log.auto_restart_ok"));
         }
-        catch (Exception ex) { Log($"[WARN] 自动重启失败: {ex.Message}"); }
+        catch (Exception ex) { Log($"[WARN] {L10n.Get("log.auto_restart_fail")}: {ex.Message}"); }
     }
 
     [RelayCommand] void DisconnectAll()
     {
-        try { _svc.DisconnectClients(); ConnectedDevices.Clear(); ConnectionCount = 0; Log("已断开所有客户端"); }
+        try { _svc.DisconnectClients(); ConnectedDevices.Clear(); ConnectionCount = 0; Log(L10n.Get("log.disconnected_all")); }
         catch (Exception ex) { Log($"[ERROR] {ex.Message}"); }
     }
 

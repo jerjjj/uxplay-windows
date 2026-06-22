@@ -12,7 +12,7 @@ public class LogPage : Page
         var logContent = new TextBlock
         {
             Text = vm.LogText,
-            Foreground = UI.Res("TextFillColorPrimaryBrush"),
+            Foreground = UI.TextPrimary,
             FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Cascadia Mono, Consolas"),
             FontSize = 12.5,
             TextWrapping = TextWrapping.Wrap,
@@ -36,8 +36,8 @@ public class LogPage : Page
         // 日志区域 — 使用 theme resource 背景
         var logBorder = new Border
         {
-            Background = UI.Res("LayerFillColorDefaultBrush"),
-            BorderBrush = UI.Res("CardStrokeColorDefaultBrush"),
+            Background = UI.LogBg,
+            BorderBrush = UI.CardBorder,
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(8),
             Padding = new Thickness(16),

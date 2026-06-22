@@ -1,0 +1,17 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--
+    local.props.sample — 模板文件（提交到 GitHub）
+
+    使用方法:
+      复制此文件为 local.props，填入你的真实值。
+      local.props 已被 .gitignore 排除，不会提交到 GitHub。
+  -->
+  <PropertyGroup>
+    <!-- Partner Center Publisher ID（在 Partner Center → 帐户设置 中查找） -->
+    <Publisher>CN=YourPublisherId-HERE</Publisher>
+    <!-- 自签名证书指纹（运行 tools/IconGen/createcert.ps1 生成） -->
+    <PackageCertificateThumbprint>YourThumbprint-HERE</PackageCertificateThumbprint>
+    <!-- 自签名证书文件名 -->
+    <PackageCertificateKeyFile>UxPlay_TemporaryKey.pfx</PackageCertificateKeyFile>
+  </PropertyGroup>
+</Project>

@@ -1,5 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- ── 加载本地敏感信息（local.props 已加入 .gitignore，不会提交到 GitHub）── -->
+  <Import Project="local.props" Condition="Exists('local.props')" />
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows10.0.22621.0</TargetFramework>
@@ -9,13 +12,48 @@
     <RuntimeIdentifiers>win-x64;win-x86;win-arm64</RuntimeIdentifiers>
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
-    <WindowsPackageType>None</WindowsPackageType>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>UxPlayClient</RootNamespace>
     <AssemblyName>UxPlayClient</AssemblyName>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\appicon.ico</ApplicationIcon>
+    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0</FileVersion>
   </PropertyGroup>
+
+  <!-- ── 默认: Unpackaged ── -->
+  <PropertyGroup>
+    <WindowsPackageType>None</WindowsPackageType>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
+  </PropertyGroup>
+
+  <!-- ── MSIX 侧载: dotnet build -p:Packaged=true ── -->
+  <PropertyGroup Condition="'$(Packaged)' == 'true'">
+    <WindowsPackageType>MSIX</WindowsPackageType>
+    <GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
+    <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
+    <PackageCertificateThumbprint>$(PackageCertificateThumbprint)</PackageCertificateThumbprint>
+    <PackageCertificateKeyFile>$(PackageCertificateKeyFile)</PackageCertificateKeyFile>
+    <ApplicationManifest>Package.appxmanifest</ApplicationManifest>
+    <AppxAutoMergePackage>true</AppxAutoMergePackage>
+  </PropertyGroup>
+
+  <!-- ── 微软商店: dotnet build -p:Store=true ── -->
+  <PropertyGroup Condition="'$(Store)' == 'true'">
+    <WindowsPackageType>MSIX</WindowsPackageType>
+    <ApplicationManifest>Package.appxmanifest</ApplicationManifest>
+    <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
+    <!-- 覆盖清单中的 Publisher（来自 local.props） -->
+    <Publisher>$(Publisher)</Publisher>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="tools\**" />
+    <None Remove="tools\**" />
+    <Content Remove="tools\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250228000" />
@@ -24,6 +62,27 @@
 
   <ItemGroup Condition="Exists('libuxplay\build\libuxplaylib.dll')">
     <Content Include="libuxplay\build\libuxplaylib.dll" Link="libuxplaylib.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\appicon.ico" Link="appicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\StoreLogo.png" Link="Assets\StoreLogo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Square150x150Logo.png" Link="Assets\Square150x150Logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Square44x44Logo.png" Link="Assets\Square44x44Logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Wide310x150Logo.png" Link="Assets\Wide310x150Logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\SplashScreen.png" Link="Assets\SplashScreen.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -17,3 +17,7 @@ libuxplay/build/
 *.log
 dotnet-install.ps1
 dotnet8-sdk.*
+
+UxPlay_TemporaryKey.pfx
+local.props
+Package.appxmanifest
