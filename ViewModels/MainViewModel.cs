@@ -25,13 +25,17 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] bool _pinVisible;
     [ObservableProperty] string _audioArtist = "", _audioTitle = "";
     [ObservableProperty] bool _audioMetaVisible;
-    [ObservableProperty] double _volume = 1.0;
     [ObservableProperty] string _logText = "";
     [ObservableProperty] string _errorMessage = "";
 
     public ObservableCollection<string> ConnectedDevices { get; } = new();
 
     private UxPlayState _currentState;
+
+    // ── 配置缓存：避免每次 DoStart 都重新分配 UxPlayConfig 字符串 ──
+    private AppSettings? _lastCfg;
+    private UxPlayConfig _cachedNativeCfg;
+    private bool _cfgInitialized;
 
     public MainViewModel(UxPlayService svc, DispatcherQueue dq)
     {
@@ -86,13 +90,43 @@ public partial class MainViewModel : ObservableObject
     {
         _svc.Create();
         var s = AppSettings.Load();
-        var cfg = s.ToNativeConfig();
-        _svc.Configure(ref cfg);
-        cfg.Dispose();
+
+        if (!_cfgInitialized || !ConfigEquals(_lastCfg, s))
+        {
+            // 配置有变更：用 UpdateFrom 增量更新（仅变化字符串才 Marshal 重分配）
+            if (!_cfgInitialized)
+                _cachedNativeCfg = new UxPlayConfig();
+            _cachedNativeCfg.UpdateFrom(s);
+            _svc.Configure(ref _cachedNativeCfg);
+            _lastCfg = s;
+            _cfgInitialized = true;
+        }
+
         await _svc.StartAsync();
         await Task.Delay(500);
         ApplyState(_svc.GetState());
         ConnectionCount = _svc.GetConnectionCount();
+    }
+
+    /// <summary>浅比较关键配置字段，判断是否需要重新 Configure</summary>
+    static bool ConfigEquals(AppSettings? a, AppSettings b)
+    {
+        if (a is null) return false;
+        return a.ServerName == b.ServerName && a.MacAddress == b.MacAddress
+            && a.AppendHostname == b.AppendHostname && a.Width == b.Width && a.Height == b.Height
+            && a.RefreshRate == b.RefreshRate && a.MaxFps == b.MaxFps && a.Videosink == b.Videosink
+            && a.VideosinkOptions == b.VideosinkOptions && a.VideoDecoder == b.VideoDecoder
+            && a.VideoConverter == b.VideoConverter && a.VideoParser == b.VideoParser
+            && a.VideoFlip == b.VideoFlip && a.Fullscreen == b.Fullscreen && a.H265Support == b.H265Support
+            && a.VideoSync == b.VideoSync && a.Bt709Fix == b.Bt709Fix && a.UseVideo == b.UseVideo
+            && a.NoFreeze == b.NoFreeze && a.Audiosink == b.Audiosink && a.AudioSync == b.AudioSync
+            && a.UseAudio == b.UseAudio && a.InitialVolume == b.InitialVolume && a.DbLow == b.DbLow
+            && a.DbHigh == b.DbHigh && a.AccessControl == b.AccessControl && a.Password == b.Password
+            && a.Keyfile == b.Keyfile && a.RegistrationList == b.RegistrationList
+            && a.LogLevel == b.LogLevel && a.CoverartDisplay == b.CoverartDisplay
+            && a.CoverartFilename == b.CoverartFilename && a.HlsSupport == b.HlsSupport
+            && a.Lang == b.Lang && a.NoHold == b.NoHold
+            && a.TcpPorts[0] == b.TcpPorts[0] && a.TcpPorts[1] == b.TcpPorts[1] && a.TcpPorts[2] == b.TcpPorts[2];
     }
 
     // ── 命令 ──
@@ -151,7 +185,6 @@ public partial class MainViewModel : ObservableObject
         catch (Exception ex) { Log($"[ERROR] {ex.Message}"); }
     }
 
-    [RelayCommand] void VolumeChanged() { try { _svc.SetVolume(Volume); } catch { } }
     [RelayCommand] void ClearLog() { _logBuf.Clear(); LogText = ""; }
 
     // ── 日志（StringBuilder 避免 O(n) 字符串拷贝） ──

@@ -85,6 +85,37 @@ public class AppSettings
     static readonly JsonSerializerOptions s_opt = new() { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
     static string Path_ => System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UxPlayClient", "appsettings.json");
 
-    public bool Save() { try { Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Path_)!); File.WriteAllText(Path_, JsonSerializer.Serialize(this, s_opt)); return true; } catch { return false; } }
-    public static AppSettings Load() { try { var p = Path_; return File.Exists(p) ? JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(p), s_opt) ?? new() : new(); } catch { return new(); } }
+    // ── 内存缓存：避免每次属性访问都读盘+反序列化 ──
+    static AppSettings? s_cached;
+    static readonly object s_lock = new();
+
+    public bool Save()
+    {
+        try
+        {
+            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Path_)!);
+            File.WriteAllText(Path_, JsonSerializer.Serialize(this, s_opt));
+            lock (s_lock) { s_cached = this; } // 写盘后同步缓存
+            return true;
+        }
+        catch { return false; }
+    }
+
+    public static AppSettings Load()
+    {
+        // 快速路径：缓存命中则零 I/O
+        lock (s_lock) { if (s_cached is not null) return s_cached; }
+
+        try
+        {
+            var p = Path_;
+            var result = File.Exists(p) ? JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(p), s_opt) ?? new() : new();
+            lock (s_lock) { s_cached = result; }
+            return result;
+        }
+        catch { return new(); }
+    }
+
+    /// <summary>强制下次 Load() 重新读盘（外部修改了配置文件时调用）</summary>
+    public static void InvalidateCache() { lock (s_lock) { s_cached = null; } }
 }

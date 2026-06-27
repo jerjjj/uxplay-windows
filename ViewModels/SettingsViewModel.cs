@@ -29,7 +29,6 @@ public partial class SettingsViewModel : ObservableObject
 
     // ── 网络 ──
     [ObservableProperty] ushort _tcpPort1, _tcpPort2, _tcpPort3;
-    [ObservableProperty] ushort _udpPort1, _udpPort2, _udpPort3;
 
     // ── 安全 ──
     [ObservableProperty] int _accessControlIndex;
@@ -66,9 +65,6 @@ public partial class SettingsViewModel : ObservableObject
         TcpPort1 = s.TcpPorts.Length > 0 ? s.TcpPorts[0] : (ushort)0;
         TcpPort2 = s.TcpPorts.Length > 1 ? s.TcpPorts[1] : (ushort)0;
         TcpPort3 = s.TcpPorts.Length > 2 ? s.TcpPorts[2] : (ushort)0;
-        UdpPort1 = s.UdpPorts.Length > 0 ? s.UdpPorts[0] : (ushort)0;
-        UdpPort2 = s.UdpPorts.Length > 1 ? s.UdpPorts[1] : (ushort)0;
-        UdpPort3 = s.UdpPorts.Length > 2 ? s.UdpPorts[2] : (ushort)0;
         AccessControlIndex = (int)s.AccessControl; Password = s.Password ?? ""; Keyfile = s.Keyfile ?? "";
         RegistrationList = s.RegistrationList; RestrictClients = s.RestrictClients;
         LogLevelIndex = (int)s.LogLevel - 3;
@@ -97,7 +93,7 @@ public partial class SettingsViewModel : ObservableObject
         AudioSync = AudioSync, UseAudio = UseAudio, TaperVolume = TaperVolume,
         DbLow = DbLow, DbHigh = DbHigh,
         TcpPorts = [TcpPort1, TcpPort2, TcpPort3],
-        UdpPorts = [UdpPort1, UdpPort2, UdpPort3],
+        UdpPorts = [0, 0, 0], // UDP 端口无独立 UI；原生侧 TCP/UDP 共享 -p 参数
         AccessControl = (UxPlayAccessControl)AccessControlIndex,
         Password = string.IsNullOrWhiteSpace(Password) ? null : Password,
         Keyfile = string.IsNullOrWhiteSpace(Keyfile) ? null : Keyfile,
@@ -124,7 +120,7 @@ public partial class SettingsViewModel : ObservableObject
         VideoSync = d.VideoSync; Bt709Fix = d.Bt709Fix; UseVideo = d.UseVideo; NoFreeze = d.NoFreeze;
         Audiosink = d.Audiosink; AudioSync = d.AudioSync; UseAudio = d.UseAudio; TaperVolume = d.TaperVolume;
         DbLow = d.DbLow; DbHigh = d.DbHigh;
-        TcpPort1 = 0; TcpPort2 = 0; TcpPort3 = 0; UdpPort1 = 0; UdpPort2 = 0; UdpPort3 = 0;
+        TcpPort1 = 0; TcpPort2 = 0; TcpPort3 = 0;
         AccessControlIndex = 0; Password = ""; Keyfile = "";
         RegistrationList = d.RegistrationList; RestrictClients = d.RestrictClients;
         LogLevelIndex = 2; HlsSupport = d.HlsSupport; NoHold = d.NoHold;

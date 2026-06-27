@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using UxPlayClient.Models;
 
 namespace UxPlayClient.Interop;
 
@@ -92,6 +93,55 @@ public struct UxPlayConfig : IDisposable
     public void Dispose() { F(ref _a0);F(ref _a1);F(ref _a2);F(ref _a3);F(ref _a4);F(ref _a5);F(ref _a6);F(ref _a7);F(ref _a8);F(ref _a9);F(ref _a10);F(ref _a11); }
     static IntPtr A(string? s) { if(s is null) return IntPtr.Zero; var b=System.Text.Encoding.UTF8.GetBytes(s+'\0'); var p=Marshal.AllocHGlobal(b.Length); Marshal.Copy(b,0,p,b.Length); return p; }
     static void F(ref IntPtr p) { if(p!=IntPtr.Zero){Marshal.FreeHGlobal(p);p=IntPtr.Zero;} }
+
+    // ── 增量更新：仅变更的字符串才重新分配 ──
+    static void SetIfChanged(ref IntPtr field, ref IntPtr ptr, string? newVal)
+    {
+        var existing = Marshal.PtrToStringUTF8(ptr);
+        if (existing == newVal) return;
+        F(ref field);
+        field = A(newVal);
+        ptr = field;
+    }
+
+    /// <summary>从 AppSettings 更新配置，仅变更的字符串才重新分配</summary>
+    public void UpdateFrom(AppSettings s)
+    {
+        // 值类型直接赋值（零 Marshal 开销）
+        AppendHostname = s.AppendHostname; Width = s.Width; Height = s.Height;
+        RefreshRate = s.RefreshRate; MaxFps = s.MaxFps;
+        VideoFlip = s.VideoFlip; Fullscreen = s.Fullscreen; H265Support = s.H265Support;
+        VideoSync = s.VideoSync; Bt709Fix = s.Bt709Fix; UseVideo = s.UseVideo; NoFreeze = s.NoFreeze;
+        AudioSync = s.AudioSync; UseAudio = s.UseAudio;
+        InitialVolume = s.InitialVolume; DbLow = s.DbLow; DbHigh = s.DbHigh;
+        AccessControl = s.AccessControl; RegistrationList = s.RegistrationList;
+        LogLevel = s.LogLevel; CoverartDisplay = s.CoverartDisplay;
+        HlsSupport = s.HlsSupport; NoHold = s.NoHold;
+        // 数组直接赋值
+        if (s.TcpPorts is not null) { TcpPorts[0] = s.TcpPorts[0]; TcpPorts[1] = s.TcpPorts[1]; TcpPorts[2] = s.TcpPorts[2]; }
+        if (s.UdpPorts is not null) { UdpPorts[0] = s.UdpPorts[0]; UdpPorts[1] = s.UdpPorts[1]; UdpPorts[2] = s.UdpPorts[2]; }
+
+        // 字符串仅在变化时重新分配
+        SetIfChanged(ref _a0,  ref ServerNamePtr,      s.ServerName);
+        SetIfChanged(ref _a1,  ref MacAddressPtr,       s.MacAddress);
+
+        // Windows 下全屏必须用 d3d11videosink
+        var sink = s.Videosink;
+        if (s.Fullscreen && RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            && (string.IsNullOrWhiteSpace(sink) || sink == "autovideosink"))
+            sink = "d3d11videosink";
+
+        SetIfChanged(ref _a2,  ref VideosinkPtr,        sink);
+        SetIfChanged(ref _a3,  ref VideosinkOptionsPtr,  s.VideosinkOptions);
+        SetIfChanged(ref _a4,  ref VideoDecoderPtr,      s.VideoDecoder);
+        SetIfChanged(ref _a5,  ref VideoConverterPtr,    s.VideoConverter);
+        SetIfChanged(ref _a6,  ref VideoParserPtr,       s.VideoParser);
+        SetIfChanged(ref _a7,  ref AudiosinkPtr,         s.Audiosink);
+        SetIfChanged(ref _a8,  ref PasswordPtr,          s.Password);
+        SetIfChanged(ref _a9,  ref KeyfilePtr,           s.Keyfile);
+        SetIfChanged(ref _a10, ref CoverartFilenamePtr,  s.CoverartFilename);
+        SetIfChanged(ref _a11, ref LangPtr,              s.Lang);
+    }
 }
 
 // ==================== Callbacks ====================

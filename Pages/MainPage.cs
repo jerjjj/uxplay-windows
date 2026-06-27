@@ -15,7 +15,6 @@ public class MainPage : Page
     private readonly Ellipse _statusDot;
     private readonly ProgressRing _statusRing;
     private readonly Button _startBtn, _stopBtn, _disconnBtn;
-    private readonly Slider _volumeSlider;
     private readonly Border _pinCard;
     private readonly TextBlock _pinCodeText;
     private readonly Border _audioCard;
@@ -53,19 +52,6 @@ public class MainPage : Page
         btns.Children.Add(_stopBtn);
         btns.Children.Add(restartBtn);
         btns.Children.Add(_disconnBtn);
-
-        // ── 音量 ──
-        _volumeSlider = new Slider { Minimum = 0, Maximum = 1, StepFrequency = 0.01, Value = vm.Volume };
-        _volumeSlider.ValueChanged += (_, _) => { vm.Volume = _volumeSlider.Value; vm.VolumeChangedCommand.Execute(null); };
-
-        var volGrid = new Grid { ColumnSpacing = 12, Margin = new Thickness(0, 8, 0, 0) };
-        volGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        volGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        var volIcon = new FontIcon { Glyph = "\uE995", FontSize = 16, VerticalAlignment = VerticalAlignment.Center }; // Speaker
-        Grid.SetColumn(volIcon, 0);
-        Grid.SetColumn(_volumeSlider, 1);
-        volGrid.Children.Add(volIcon);
-        volGrid.Children.Add(_volumeSlider);
 
         // ── PIN ──
         _pinCodeText = new TextBlock
@@ -120,7 +106,7 @@ public class MainPage : Page
                 Children =
                 {
                     UI.Card(UI.Title(L10n.Get("status.title")), statusRow, _connText),
-                    UI.Card(UI.Title(L10n.Get("ctrl.title")), btns, volGrid),
+                    UI.Card(UI.Title(L10n.Get("ctrl.title")), btns),
                     _pinCard,
                     _audioCard,
                     UI.Card(UI.Title(L10n.Get("devices.title")), _deviceList, _noDeviceText),
