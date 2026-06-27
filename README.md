@@ -22,10 +22,10 @@
 
 ## 系统要求
 
-- Windows 10 (1809+) 或 Windows 11
+- Windows 10 (19041+) 或 Windows 11
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- [MSYS2](https://www.msys2.org/)（提供 MinGW-w64 编译工具链）
-- [Bonjour SDK](https://developer.apple.com/bonjour/)（或 iTunes 中自带的 Bonjour 服务）
+- [MSYS2](https://www.msys2.org/) + [Bonjour SDK](https://developer.apple.com/bonjour/)（仅构建时需要，运行时已全部打包在内）
+- 运行投屏功能需要 Bonjour 服务（安装 iTunes 或 [Bonjour Print Services](https://support.apple.com/bonjour)）
 
 ## 快速开始
 
@@ -64,10 +64,10 @@ cd uxplay-windows
 首次构建时，`build.ps1` 会自动从 `.sample` 模板复制配置文件：
 
 ```powershell
-# 编辑 local.props，填入你的 Publisher ID（在 Partner Center → 帐户设置中查找）
+# 编辑 local.props，填入你的证书指纹（本地开发用）
 notepad local.props
 
-# 编辑 Package.appxmanifest，填入你的 Identity Name 和 Publisher
+# 编辑 Package.appxmanifest，填入你的应用标识
 notepad Package.appxmanifest
 ```
 
@@ -75,15 +75,14 @@ notepad Package.appxmanifest
 
 ### 4. 一键构建
 
+构建脚本会自动打包运行所需的全部 MSYS2 依赖（15 个运行时 DLL + 239 个 GStreamer 插件），用户无需手动安装。
+
 ```powershell
 # Unpackaged EXE（本地开发/调试）
 pwsh build.ps1
 
 # MSIX 侧载包（本地测试安装）
 pwsh build.ps1 -Packaged
-
-# 微软商店上传包
-pwsh build.ps1 -Store
 
 # 自包含发布 + 安装程序
 pwsh build.ps1 -Publish -Installer
@@ -114,9 +113,6 @@ dotnet build -c Release
 
 # MSIX 侧载
 dotnet build -c Release -p:Packaged=true
-
-# 微软商店
-dotnet msbuild -t:Build -p:Configuration=Release -p:Platform=x64 -p:Store=true -p:GenerateAppxPackageOnBuild=true
 ```
 
 ## 运行
@@ -125,13 +121,6 @@ dotnet msbuild -t:Build -p:Configuration=Release -p:Platform=x64 -p:Store=true -
 2. 运行 `UxPlayClient.exe`
 3. 点击「启用投屏」
 4. 在 iPhone / iPad / Mac 控制中心选择「屏幕镜像」，找到服务器名称并连接
-
-## 发布到微软商店
-
-1. 在 [Partner Center](https://partner.microsoft.com) 注册并预留应用名称
-2. 将 `Package.appxmanifest` 中的 `Identity Name` 和 `Publisher` 改为你的值
-3. 运行 `pwsh build.ps1 -Store`
-4. 将生成的 `.msix` 文件上传到 Partner Center 提交页面
 
 ## 项目结构
 
@@ -162,7 +151,6 @@ UxPlayClient/
 | `-Runtime` | win-x64 / win-x86 / win-arm64 |
 | `-SkipNative` | 跳过 libuxplay 编译 |
 | `-Packaged` | 生成 MSIX 侧载包（自签名） |
-| `-Store` | 生成微软商店上传包 |
 | `-Publish` | 生成自包含发布目录 |
 | `-Installer` | 生成 Inno Setup 安装程序 |
 

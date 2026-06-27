@@ -14,7 +14,7 @@ public static class L10n
     static readonly Dictionary<string, string> _en = new()
     {
         ["app.title"] = "UxPlay Client",
-        ["app.version"] = "v1.1.0",
+        ["app.version"] = "v1.2.0",
         ["nav.home"] = "Home",
         ["nav.settings"] = "Settings",
         ["nav.log"] = "Log",
@@ -208,7 +208,7 @@ public static class L10n
     static readonly Dictionary<string, string> _zh = new()
     {
         ["app.title"] = "UxPlay Client",
-        ["app.version"] = "v1.1.0",
+        ["app.version"] = "v1.2.0",
         ["nav.home"] = "主页",
         ["nav.settings"] = "设置",
         ["nav.log"] = "日志",

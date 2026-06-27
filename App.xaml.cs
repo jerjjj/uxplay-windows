@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Microsoft.UI.Xaml;
 using UxPlayClient.Services;
@@ -8,17 +9,27 @@ public partial class App : Application
 {
     public App()
     {
+        // Set GStreamer paths BEFORE WinUI/XAML init (needed for MSIX bundled plugins)
+        SetGStreamerPaths();
+
         InitializeComponent();
         L10n.LoadSavedLanguage();
+        UI.IsDark = L10n.Theme == AppTheme.Dark;
 
-        // Apply theme at STARTUP only (API doesn't support runtime changes)
         var t = L10n.Theme;
-        UI.IsDark = t == AppTheme.Dark;
-        if (t == AppTheme.Light)
-            RequestedTheme = ApplicationTheme.Light;
-        else if (t == AppTheme.Dark)
-            RequestedTheme = ApplicationTheme.Dark;
-        // System: don't touch — WinUI follows OS
+        if (t == AppTheme.Light)      RequestedTheme = ApplicationTheme.Light;
+        else if (t == AppTheme.Dark)  RequestedTheme = ApplicationTheme.Dark;
+    }
+
+    static void SetGStreamerPaths()
+    {
+        var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        var pluginDir = Path.Combine(baseDir, "gstreamer-1.0");
+        if (Directory.Exists(pluginDir))
+        {
+            Environment.SetEnvironmentVariable("GST_PLUGIN_PATH", pluginDir);
+            Environment.SetEnvironmentVariable("GST_PLUGIN_SYSTEM_PATH", pluginDir);
+        }
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
@@ -28,9 +39,6 @@ public partial class App : Application
             System.Diagnostics.Debug.WriteLine($"[WARN] libuxplaylib.dll not found at {dllPath}");
 
         var window = new MainWindow();
-        _window = window;
         window.Activate();
     }
-
-    private Window? _window;
 }

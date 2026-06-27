@@ -17,9 +17,15 @@
     <RootNamespace>UxPlayClient</RootNamespace>
     <AssemblyName>UxPlayClient</AssemblyName>
     <ApplicationIcon>Assets\appicon.ico</ApplicationIcon>
-    <Version>1.1.0</Version>
-    <AssemblyVersion>1.1.0</AssemblyVersion>
-    <FileVersion>1.1.0</FileVersion>
+    <Version>1.2.0</Version>
+    <AssemblyVersion>1.2.0</AssemblyVersion>
+    <FileVersion>1.2.0</FileVersion>
+  </PropertyGroup>
+
+  <!-- ── 证书默认值（local.props 可覆盖）── -->
+  <PropertyGroup>
+    <PackageCertificateThumbprint Condition="'$(PackageCertificateThumbprint)' == ''">3DA90379D6E4DC33933CB17D8DC8D80ADF33D31C</PackageCertificateThumbprint>
+    <PackageCertificateKeyFile Condition="'$(PackageCertificateKeyFile)' == ''">UxPlay_TemporaryKey.pfx</PackageCertificateKeyFile>
   </PropertyGroup>
 
   <!-- ── 默认: Unpackaged ── -->
@@ -36,18 +42,38 @@
     <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
     <PackageCertificateThumbprint>$(PackageCertificateThumbprint)</PackageCertificateThumbprint>
     <PackageCertificateKeyFile>$(PackageCertificateKeyFile)</PackageCertificateKeyFile>
-    <ApplicationManifest>Package.appxmanifest</ApplicationManifest>
     <AppxAutoMergePackage>true</AppxAutoMergePackage>
   </PropertyGroup>
 
   <!-- ── 微软商店: dotnet build -p:Store=true ── -->
   <PropertyGroup Condition="'$(Store)' == 'true'">
     <WindowsPackageType>MSIX</WindowsPackageType>
-    <ApplicationManifest>Package.appxmanifest</ApplicationManifest>
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
-    <!-- 覆盖清单中的 Publisher（来自 local.props） -->
-    <Publisher>$(Publisher)</Publisher>
   </PropertyGroup>
+
+  <!-- ── 复制 MSYS2 依赖 DLL ── -->
+  <Target Name="CopyMsys2Dlls" BeforeTargets="AssignTargetPaths" Condition="Exists('C:\msys64\ucrt64\bin\libgstreamer-1.0-0.dll')">
+
+    <ItemGroup>
+      <_M2Dlls Include="C:\msys64\ucrt64\bin\*.dll" />
+
+      <_GstPlugins Include="C:\msys64\ucrt64\lib\gstreamer-1.0\*.dll" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_M2Dlls)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_GstPlugins)" DestinationFolder="$(OutputPath)gstreamer-1.0\" SkipUnchangedFiles="true" />
+
+    <ItemGroup>
+      <Content Include="@(_M2Dlls)" Link="%(FileName)%(Extension)">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="@(_GstPlugins)" Link="gstreamer-1.0\%(FileName)%(Extension)">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <Message Text="Bundled @(_M2Dlls->Count()) MSYS2 DLLs + @(_GstPlugins->Count()) GStreamer plugins" Importance="high" />
+  </Target>
 
   <ItemGroup>
     <Compile Remove="tools\**" />
@@ -60,29 +86,11 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="Exists('libuxplay\build\libuxplaylib.dll')">
-    <Content Include="libuxplay\build\libuxplaylib.dll" Link="libuxplaylib.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
   <ItemGroup>
-    <Content Include="Assets\appicon.ico" Link="appicon.ico">
+    <Content Include="Assets\**" Link="Assets\%(RecursiveDir)%(FileName)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\StoreLogo.png" Link="Assets\StoreLogo.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Square150x150Logo.png" Link="Assets\Square150x150Logo.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Square44x44Logo.png" Link="Assets\Square44x44Logo.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Wide310x150Logo.png" Link="Assets\Wide310x150Logo.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\SplashScreen.png" Link="Assets\SplashScreen.png">
+    <Content Include="libuxplay\build\libuxplaylib.dll" Link="libuxplaylib.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

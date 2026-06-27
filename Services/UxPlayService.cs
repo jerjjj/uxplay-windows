@@ -36,7 +36,7 @@ public sealed class UxPlayService : IDisposable
         }
         catch (DllNotFoundException)
         {
-            throw new DllNotFoundException("libuxplaylib.dll 未找到！");
+            throw new DllNotFoundException(L10n.Get("log.dll_not_found"));
         }
         _eCb = OnEvent; _lCb = OnLog;
         UxPlayNative.uxplay_set_event_callback(_h, _eCb, IntPtr.Zero);
@@ -55,8 +55,16 @@ public sealed class UxPlayService : IDisposable
         if (_h == IntPtr.Zero) throw new InvalidOperationException("Call Create() first");
         return Task.Run(() =>
         {
-            var err = UxPlayNative.uxplay_start(_h);
-            if (err != UxPlayError.Ok) throw new InvalidOperationException($"uxplay_start: {err}");
+            try
+            {
+                var err = UxPlayNative.uxplay_start(_h);
+                if (err != UxPlayError.Ok)
+                    _dq.TryEnqueue(() => ErrorOccurred?.Invoke(this, $"uxplay_start: {err}"));
+            }
+            catch (Exception ex)
+            {
+                _dq.TryEnqueue(() => ErrorOccurred?.Invoke(this, ex.Message));
+            }
         });
     }
 

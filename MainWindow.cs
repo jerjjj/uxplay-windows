@@ -23,9 +23,9 @@ public class MainWindow : Window
     public MainWindow()
     {
         Title = "UxPlay Client";
-        SystemBackdrop = null;
-        AppWindow.Resize(new SizeInt32(1100, 720));
-        SetIcon();
+        try { SystemBackdrop = null; } catch { }
+        try { AppWindow.Resize(new SizeInt32(1100, 720)); } catch { }
+        try { SetIcon(); } catch { }
 
         _headerText = new TextBlock { FontSize = 18, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(4, 0, 0, 0) };
 

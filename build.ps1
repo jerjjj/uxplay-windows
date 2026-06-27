@@ -22,7 +22,7 @@
   生成 MSIX 侧载包（自签名，用于本地测试）
 
 .PARAMETER Store
-  生成微软商店上传包（无签名，上传到 Partner Center）
+  生成微软商店上传包（无签名）
 
 .EXAMPLE
   pwsh build.ps1                           # 构建 Unpackaged EXE
@@ -43,8 +43,8 @@ $ErrorActionPreference = "Stop"
 $Root = $PSScriptRoot
 $Platform = ($Runtime -replace '^win-','')
 
-# ── 模式冲突检查 ──
-if ($Packaged -and $Store) { Write-Error "不能同时指定 -Packaged 和 -Store"; exit 1 }
+# ── 模式设置 ──
+$ModeStr = if ($Store) { "MSIX Store" } elseif ($Packaged) { "MSIX" } else { "Unpackaged" }
 
 # ── 查找 dotnet ──
 $dotnet = $null
@@ -130,8 +130,10 @@ if ($Packaged -or $Store) {
 } else {
     $exe = "$outBase\UxPlayClient.exe"
     if (Test-Path $exe) {
+        $dllCount = (Get-ChildItem "$outBase\*.dll" -ErrorAction SilentlyContinue).Count
+        $gstCount = (Get-ChildItem "$outBase\gstreamer-1.0\*.dll" -ErrorAction SilentlyContinue).Count
         Write-Host "`n=== 输出 ===" -ForegroundColor Green
-        Write-Host "  $exe" -ForegroundColor White
+        Write-Host "  $exe (+ $dllCount runtime DLLs, $gstCount GStreamer plugins)" -ForegroundColor White
     }
 }
 
@@ -162,9 +164,9 @@ if ($Installer) {
         if (-not (Test-Path $pubDir)) {
             Write-Warning "请先运行 -Publish 生成发布包"
         } else {
-            & $iscc "/DPublishDir=$pubDir" "/DAppVersion=1.1.0" "$Root\installer.iss"
+            & $iscc "/DPublishDir=$pubDir" "/DAppVersion=1.2.0" "$Root\installer.iss"
             if ($LASTEXITCODE -ne 0) { Write-Error "安装程序生成失败"; exit 1 }
-            Write-Host "  [+] $Root\Output\UxPlayClient-1.1.0-setup.exe" -ForegroundColor Green
+            Write-Host "  [+] $Root\Output\UxPlayClient-1.2.0-setup.exe" -ForegroundColor Green
         }
     }
 }
