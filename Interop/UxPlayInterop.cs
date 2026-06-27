@@ -117,7 +117,9 @@ public struct UxPlayConfig : IDisposable
         AccessControl = s.AccessControl; RegistrationList = s.RegistrationList;
         LogLevel = s.LogLevel; CoverartDisplay = s.CoverartDisplay;
         HlsSupport = s.HlsSupport; NoHold = s.NoHold;
-        // 数组直接赋值
+        // 数组：struct 默认 new 时为 null，需先初始化
+        TcpPorts ??= new ushort[3];
+        UdpPorts ??= new ushort[3];
         if (s.TcpPorts is not null) { TcpPorts[0] = s.TcpPorts[0]; TcpPorts[1] = s.TcpPorts[1]; TcpPorts[2] = s.TcpPorts[2]; }
         if (s.UdpPorts is not null) { UdpPorts[0] = s.UdpPorts[0]; UdpPorts[1] = s.UdpPorts[1]; UdpPorts[2] = s.UdpPorts[2]; }
 
