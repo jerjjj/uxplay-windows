@@ -7,6 +7,8 @@ namespace UxPlayClient;
 
 public partial class App : Application
 {
+    private static Windows.UI.ViewManagement.UISettings? s_uiSettings;
+
     public App()
     {
         // Set GStreamer paths BEFORE WinUI/XAML init (needed for MSIX bundled plugins)
@@ -14,11 +16,35 @@ public partial class App : Application
 
         InitializeComponent();
         L10n.LoadSavedLanguage();
-        UI.IsDark = L10n.Theme == AppTheme.Dark;
 
         var t = L10n.Theme;
-        if (t == AppTheme.Light)      RequestedTheme = ApplicationTheme.Light;
-        else if (t == AppTheme.Dark)  RequestedTheme = ApplicationTheme.Dark;
+        if (t == AppTheme.Light)      { RequestedTheme = ApplicationTheme.Light; UI.IsDark = false; }
+        else if (t == AppTheme.Dark)  { RequestedTheme = ApplicationTheme.Dark;  UI.IsDark = true; }
+        else                          { UI.IsDark = IsSystemDark(); } // System: follow actual OS theme
+
+        // Listen for system theme changes (only relevant when theme == System)
+        s_uiSettings = new Windows.UI.ViewManagement.UISettings();
+        s_uiSettings.ColorValuesChanged += (_, _) =>
+        {
+            if (L10n.Theme == AppTheme.System)
+            {
+                var dark = IsSystemDark();
+                if (UI.IsDark != dark)
+                {
+                    UI.IsDark = dark;
+                    // Refresh all visible windows (our brushes will update on next layout pass)
+                }
+            }
+        };
+    }
+
+    /// <summary>Detect whether Windows is currently using dark mode.</summary>
+    static bool IsSystemDark()
+    {
+        var settings = new Windows.UI.ViewManagement.UISettings();
+        var bg = settings.GetColorValue(Windows.UI.ViewManagement.UIColorType.Background);
+        // Dark backgrounds have low RGB values
+        return bg.R < 128 && bg.G < 128 && bg.B < 128;
     }
 
     static void SetGStreamerPaths()
