@@ -91,42 +91,18 @@ public partial class MainViewModel : ObservableObject
         _svc.Create();
         var s = AppSettings.Load();
 
-        if (!_cfgInitialized || !ConfigEquals(_lastCfg, s))
-        {
-            // 配置有变更：用 UpdateFrom 增量更新（仅变化字符串才 Marshal 重分配）
-            if (!_cfgInitialized)
-                _cachedNativeCfg = new UxPlayConfig();
-            _cachedNativeCfg.UpdateFrom(s);
-            _svc.Configure(ref _cachedNativeCfg);
-            _lastCfg = s;
-            _cfgInitialized = true;
-        }
+        // 始终 Configure（UpdateFrom 仅在字符串变化时 Marshal 重分配，零变更近乎零开销）
+        if (!_cfgInitialized)
+            _cachedNativeCfg = new UxPlayConfig();
+        _cachedNativeCfg.UpdateFrom(s);
+        _svc.Configure(ref _cachedNativeCfg);
+        _lastCfg = s;
+        _cfgInitialized = true;
 
         await _svc.StartAsync();
         await Task.Delay(500);
         ApplyState(_svc.GetState());
         ConnectionCount = _svc.GetConnectionCount();
-    }
-
-    /// <summary>浅比较关键配置字段，判断是否需要重新 Configure</summary>
-    static bool ConfigEquals(AppSettings? a, AppSettings b)
-    {
-        if (a is null) return false;
-        return a.ServerName == b.ServerName && a.MacAddress == b.MacAddress
-            && a.AppendHostname == b.AppendHostname && a.Width == b.Width && a.Height == b.Height
-            && a.RefreshRate == b.RefreshRate && a.MaxFps == b.MaxFps && a.Videosink == b.Videosink
-            && a.VideosinkOptions == b.VideosinkOptions && a.VideoDecoder == b.VideoDecoder
-            && a.VideoConverter == b.VideoConverter && a.VideoParser == b.VideoParser
-            && a.VideoFlip == b.VideoFlip && a.Fullscreen == b.Fullscreen && a.H265Support == b.H265Support
-            && a.VideoSync == b.VideoSync && a.Bt709Fix == b.Bt709Fix && a.UseVideo == b.UseVideo
-            && a.NoFreeze == b.NoFreeze && a.Audiosink == b.Audiosink && a.AudioSync == b.AudioSync
-            && a.UseAudio == b.UseAudio && a.InitialVolume == b.InitialVolume && a.DbLow == b.DbLow
-            && a.DbHigh == b.DbHigh && a.AccessControl == b.AccessControl && a.Password == b.Password
-            && a.Keyfile == b.Keyfile && a.RegistrationList == b.RegistrationList
-            && a.LogLevel == b.LogLevel && a.CoverartDisplay == b.CoverartDisplay
-            && a.CoverartFilename == b.CoverartFilename && a.HlsSupport == b.HlsSupport
-            && a.Lang == b.Lang && a.NoHold == b.NoHold
-            && a.TcpPorts[0] == b.TcpPorts[0] && a.TcpPorts[1] == b.TcpPorts[1] && a.TcpPorts[2] == b.TcpPorts[2];
     }
 
     // ── 命令 ──
