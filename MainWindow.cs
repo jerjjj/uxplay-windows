@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using UxPlayClient.Pages;
 using UxPlayClient.Services;
 using UxPlayClient.ViewModels;
+using UxPlayClient.Models;
 using Windows.Graphics;
 
 namespace UxPlayClient;
@@ -26,7 +27,8 @@ public class MainWindow : Window
     {
         Title = "UxPlay Client";
         try { SystemBackdrop = null; } catch { }
-        try { AppWindow.Resize(new SizeInt32(1100, 720)); } catch { }
+        var s = AppSettings.Load();
+        try { AppWindow.Resize(new SizeInt32(s.WindowWidth, s.WindowHeight)); } catch { try { AppWindow.Resize(new SizeInt32(1100, 720)); } catch { } }
         try { SetIcon(); } catch { }
 
         _headerText = new TextBlock { FontSize = 18, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(4, 0, 0, 0) };
@@ -42,7 +44,12 @@ public class MainWindow : Window
 
         _nav.SelectionChanged += OnNavSelectionChanged;
         _nav.Loaded += OnNavLoaded;
-        this.Closed += (_, _) => { _ = Task.Run(() => { try { _service?.Dispose(); } catch { } Environment.Exit(0); }); };
+        this.Closed += (_, _) =>
+        {
+            // Save window size
+            try { var sz = AppWindow.Size; var cfg = AppSettings.Load(); cfg.WindowWidth = sz.Width; cfg.WindowHeight = sz.Height; cfg.Save(); } catch { }
+            _ = Task.Run(() => { try { _service?.Dispose(); } catch { } Environment.Exit(0); });
+        };
         Content = _nav;
 
         // Apply theme

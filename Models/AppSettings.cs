@@ -59,6 +59,8 @@ public class AppSettings
     public bool ShowFpsData { get; set; }
     public string Language { get; set; } = "zh-CN";
     public Services.AppTheme Theme { get; set; } = Services.AppTheme.System;
+    public int WindowWidth { get; set; } = 1100;
+    public int WindowHeight { get; set; } = 720;
 
     public UxPlayConfig ToNativeConfig()
     {
