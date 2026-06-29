@@ -86,21 +86,23 @@ foreach ($s in $samples) {
 # ════════════════════════════════════════════
 if (-not $SkipNative) {
     Write-Host "`n--- 原生库 ---" -ForegroundColor DarkGray
-    $nativeDll = "$Root\libuxplay\build\libuxplaylib.dll"
-    if (Test-Path $nativeDll) {
-        Write-Host "  [✓] libuxplaylib.dll 已存在 (跳过)" -ForegroundColor DarkGray
-    } else {
-        Write-Host "  构建 libuxplay (cmake + ninja)..." -ForegroundColor Yellow
-        $buildDir = "$Root\libuxplay\build"
-        New-Item -ItemType Directory -Force -Path $buildDir | Out-Null
-        Push-Location $buildDir
-        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF
-        if ($LASTEXITCODE -ne 0) { Pop-Location; Write-Error "cmake 配置失败"; exit 1 }
-        ninja -j4
-        if ($LASTEXITCODE -ne 0) { Pop-Location; Write-Error "ninja 构建失败"; exit 1 }
-        Pop-Location
-        Write-Host "  [+] libuxplaylib.dll" -ForegroundColor Green
-    }
+    $buildDir = "$Root\libuxplay\build"
+    New-Item -ItemType Directory -Force -Path $buildDir | Out-Null
+    Push-Location $buildDir
+    
+    # Always re-run cmake (picks up new/removed sources in submodule updates)
+    cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF
+    if ($LASTEXITCODE -ne 0) { Pop-Location; Write-Error "cmake 配置失败"; exit 1 }
+    
+    # ninja 是增量构建，无变更时近乎零开销
+    ninja -j4
+    if ($LASTEXITCODE -ne 0) { Pop-Location; Write-Error "ninja 构建失败"; exit 1 }
+    Pop-Location
+    
+    # Copy to Output/ for F5 debugging
+    $outDll = "$Root\Output\libuxplaylib.dll"
+    Copy-Item -Force "$buildDir\libuxplaylib.dll" $outDll
+    Write-Host "  [+] libuxplaylib.dll -> Output/" -ForegroundColor Green
 }
 
 # ════════════════════════════════════════════
