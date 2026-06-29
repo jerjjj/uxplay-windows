@@ -34,6 +34,11 @@ public class LogPage : Page
         root.Children.Add(clearBtn);
 
         // 日志区域 — 使用 theme resource 背景
+        var logScroll = new ScrollViewer
+        {
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            Content = logContent,
+        };
         var logBorder = new Border
         {
             Background = UI.LogBg,
@@ -42,11 +47,7 @@ public class LogPage : Page
             CornerRadius = new CornerRadius(8),
             Padding = new Thickness(16),
             Margin = new Thickness(0, 8, 0, 0),
-            Child = new ScrollViewer
-            {
-                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                Content = logContent,
-            },
+            Child = logScroll,
         };
         Grid.SetRow(logBorder, 1);
         root.Children.Add(logBorder);
@@ -56,7 +57,7 @@ public class LogPage : Page
         vm.PropertyChanged += (_, a) =>
         {
             if (a.PropertyName == nameof(vm.LogText))
-                DispatcherQueue.TryEnqueue(() => logContent.Text = vm.LogText);
+                DispatcherQueue.TryEnqueue(() => { logContent.Text = vm.LogText; logScroll.ChangeView(null, logContent.ActualHeight, null); });
         };
     }
 }

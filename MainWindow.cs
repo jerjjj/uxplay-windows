@@ -85,10 +85,15 @@ public class MainWindow : Window
 
         _ready = true;
 
+        // 页脚版本号更新为真实 libuxplay 版本
+        if (!string.IsNullOrEmpty(_mainVm.LibVersion))
+            _footerVersion.Text = _mainVm.LibVersion;
+
         ShowPage("Home");
         _nav.SelectedItem = _nav.MenuItems[0];
 
         L10n.LanguageChanged += RefreshAll;
+        UI.ThemeChanged += () => DispatcherQueue.TryEnqueue(RefreshAll);
     }
 
     private void OnNavSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)

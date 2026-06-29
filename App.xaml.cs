@@ -32,7 +32,7 @@ public partial class App : Application
                 if (UI.IsDark != dark)
                 {
                     UI.IsDark = dark;
-                    // Refresh all visible windows (our brushes will update on next layout pass)
+                    UI.ThemeChanged?.Invoke();
                 }
             }
         };

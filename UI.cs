@@ -9,6 +9,7 @@ namespace UxPlayClient;
 static class UI
 {
     public static bool IsDark { get; set; }
+    public static Action? ThemeChanged;
 
     // ── Cached brushes (light + dark pairs) ──
     static readonly SolidColorBrush _cBgL = Brush("#F9F9F9"), _cBgD = Brush("#2D2D2D");

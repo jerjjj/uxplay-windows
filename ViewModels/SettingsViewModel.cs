@@ -54,8 +54,20 @@ public partial class SettingsViewModel : ObservableObject
     public string[] LanguageOptions => [L10n.Get("lang.en"), L10n.Get("lang.zh-CN")];
     public string[] ThemeOptions => [L10n.Get("theme.system"), L10n.Get("theme.light"), L10n.Get("theme.dark")];
 
+    private bool _loading;
+
+    public SettingsViewModel()
+    {
+        PropertyChanged += (_, e) =>
+        {
+            if (!_loading && e.PropertyName != nameof(IsDirty) && e.PropertyName != nameof(StatusMessage))
+                IsDirty = true;
+        };
+    }
+
     public void LoadSettings()
     {
+        _loading = true;
         var s = AppSettings.Load();
         ServerName = s.ServerName; MacAddress = s.MacAddress ?? ""; AppendHostname = s.AppendHostname;
         Width = s.Width; Height = s.Height; RefreshRate = s.RefreshRate; MaxFps = s.MaxFps; Overscanned = s.Overscanned;
@@ -79,6 +91,7 @@ public partial class SettingsViewModel : ObservableObject
         LanguageIndex = (s.Language == "en") ? 0 : 1;
         ThemeIndex = (int)s.Theme;
         IsDirty = false; StatusMessage = "";
+        _loading = false;
     }
 
     AppSettings Build() => new()
@@ -121,6 +134,7 @@ public partial class SettingsViewModel : ObservableObject
 
     [RelayCommand] void ResetDefaults()
     {
+        _loading = true;
         var d = new AppSettings();
         ServerName = d.ServerName; MacAddress = ""; AppendHostname = d.AppendHostname;
         Width = d.Width; Height = d.Height; RefreshRate = d.RefreshRate; MaxFps = d.MaxFps; Overscanned = d.Overscanned;
@@ -139,5 +153,6 @@ public partial class SettingsViewModel : ObservableObject
         MetadataFilename = ""; RecordFilename = ""; ResetTimeout = 0;
         LanguageIndex = 1; ThemeIndex = 0;
         IsDirty = true; StatusMessage = L10n.Get("msg.settings_reset");
+        _loading = false;
     }
 }
