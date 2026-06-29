@@ -98,9 +98,9 @@ public class MainWindow : Window
 
         _ready = true;
 
-        // 页脚版本号更新为真实 libuxplay 版本
-        if (!string.IsNullOrEmpty(_mainVm.LibVersion))
-            _footerVersion.Text = _mainVm.LibVersion;
+        // 页脚版本号：App 版本 + libuxplay 版本
+        var libVer = _mainVm.LibVersion ?? "?";
+        _footerVersion.Text = $"App {L10n.Get("app.version")} · lib {libVer}";
 
         ShowPage("Home");
         _nav.SelectedItem = _nav.MenuItems[0];
@@ -130,7 +130,7 @@ public class MainWindow : Window
     void RefreshAll()
     {
         _footerTitle.Text = L10n.Get("app.title");
-        _footerVersion.Text = _mainVm?.LibVersion ?? L10n.Get("app.version");
+        _footerVersion.Text = $"App {L10n.Get("app.version")} · lib {_mainVm?.LibVersion ?? "?"}";
         foreach (NavigationViewItem item in _nav.MenuItems)
         {
             var key = ((string)item.Tag) switch { "Home" => "nav.home", "Settings" => "nav.settings", "Log" => "nav.log", _ => null };
