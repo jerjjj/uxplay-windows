@@ -46,7 +46,7 @@ public partial class MainViewModel : ObservableObject
 
         L10n.LanguageChanged += () => { if (_svc is not null) ApplyState(_currentState); };
 
-        svc.StateChanged       += (_, s) => { ApplyState(s); if (!_userStopping && s == UxPlayState.Idle) { Log(L10n.Get("log.auto_restart")); _ = AutoRestart(); } };
+        svc.StateChanged       += (_, s) => { ApplyState(s); if (!_userStopping && s is UxPlayState.Idle or UxPlayState.Error) { Log(L10n.Get("log.auto_restart")); _ = AutoRestart(); } };
         svc.ClientConnected    += (_, _) => { ConnectionCount = svc.GetConnectionCount(); };
         svc.ClientDisconnected += (_, _) => { ConnectionCount = svc.GetConnectionCount(); if (ConnectionCount == 0) ConnectedDevices.Clear(); };
         svc.ClientInfo         += (_, c) => { ConnectedDevices.Clear(); ConnectedDevices.Add($"{c.name} ({c.model})"); Log($"{L10n.Get("log.device_connected")}: {c.name} ({c.model}) ID={c.id}"); };
