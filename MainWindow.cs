@@ -19,6 +19,8 @@ public class MainWindow : Window
     private readonly TextBlock _footerTitle, _footerVersion;
     private bool _ready;
     private string _currentTag = "Home";
+    private Page? _cachedHome, _cachedSettings, _cachedLog;
+    private AppTheme _prevTheme = (AppTheme)(-1);
 
     public MainWindow()
     {
@@ -46,18 +48,22 @@ public class MainWindow : Window
         // Apply theme
         L10n.ThemeChanged += async t =>
         {
-            var dlg = new ContentDialog
+            var prev = _prevTheme;
+            _prevTheme = t;
+            // Only Light↔Dark switch requires restart (RequestedTheme was already set)
+            if (t is AppTheme.Light or AppTheme.Dark && prev is AppTheme.Light or AppTheme.Dark && t != prev)
             {
-                Title = L10n.Get("theme.restart_title"),
-                Content = L10n.Get("theme.restart_msg"),
-                PrimaryButtonText = L10n.Get("theme.restart_now"),
-                CloseButtonText = L10n.Get("theme.restart_later"),
-                XamlRoot = _nav.XamlRoot,
-            };
-            var result = await dlg.ShowAsync();
-            if (result == ContentDialogResult.Primary)
-            {
-                Microsoft.Windows.AppLifecycle.AppInstance.Restart("");
+                var dlg = new ContentDialog
+                {
+                    Title = L10n.Get("theme.restart_title"),
+                    Content = L10n.Get("theme.restart_msg"),
+                    PrimaryButtonText = L10n.Get("theme.restart_now"),
+                    CloseButtonText = L10n.Get("theme.restart_later"),
+                    XamlRoot = _nav.XamlRoot,
+                };
+                var result = await dlg.ShowAsync();
+                if (result == ContentDialogResult.Primary)
+                    Microsoft.Windows.AppLifecycle.AppInstance.Restart("");
             }
         };
     }
@@ -104,19 +110,26 @@ public class MainWindow : Window
 
     private void ShowPage(string tag)
     {
-        _nav.Content = tag switch { "Home" => new MainPage(_mainVm!), "Settings" => new SettingsPage(_settingsVm!), "Log" => new LogPage(_mainVm!), _ => new MainPage(_mainVm!) };
+        _nav.Content = tag switch
+        {
+            "Home"     => _cachedHome     ??= new MainPage(_mainVm!),
+            "Settings" => _cachedSettings ??= new SettingsPage(_settingsVm!),
+            "Log"      => _cachedLog      ??= new LogPage(_mainVm!),
+            _ => _cachedHome ??= new MainPage(_mainVm!),
+        };
         _headerText.Text = L10n.Get($"heading.{tag.ToLower()}");
     }
 
     void RefreshAll()
     {
         _footerTitle.Text = L10n.Get("app.title");
-        _footerVersion.Text = L10n.Get("app.version");
+        _footerVersion.Text = _mainVm?.LibVersion ?? L10n.Get("app.version");
         foreach (NavigationViewItem item in _nav.MenuItems)
         {
             var key = ((string)item.Tag) switch { "Home" => "nav.home", "Settings" => "nav.settings", "Log" => "nav.log", _ => null };
             if (key != null) item.Content = L10n.Get(key);
         }
+        _cachedHome = _cachedSettings = _cachedLog = null;
         ShowPage(_currentTag);
     }
 }
