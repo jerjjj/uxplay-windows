@@ -53,20 +53,31 @@ public struct UxPlayEventData
 [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
 public struct UxPlayConfig : IDisposable
 {
+    // ── Identity ──
     public IntPtr ServerNamePtr, MacAddressPtr;
     [MarshalAs(UnmanagedType.U1)] public bool AppendHostname;
     public ushort Width, Height, RefreshRate, MaxFps;
-    public IntPtr VideosinkPtr, VideosinkOptionsPtr, VideoDecoderPtr, VideoConverterPtr, VideoParserPtr;
+
+    // ── Video ──
+    public IntPtr VideosinkPtr, VideoDecoderPtr, VideoConverterPtr, VideoParserPtr;
     public UxPlayVideoFlip VideoFlip;
     [MarshalAs(UnmanagedType.U1)] public bool Fullscreen, H265Support, VideoSync, Bt709Fix, UseVideo, NoFreeze;
+
+    // ── Audio ──
     public IntPtr AudiosinkPtr;
     [MarshalAs(UnmanagedType.U1)] public bool AudioSync, UseAudio;
     public double InitialVolume, DbLow, DbHigh;
+
+    // ── Network ──
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public ushort[] TcpPorts;
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public ushort[] UdpPorts;
+
+    // ── Security ──
     public UxPlayAccessControl AccessControl;
     public IntPtr PasswordPtr, KeyfilePtr;
     [MarshalAs(UnmanagedType.U1)] public bool RegistrationList;
+
+    // ── Misc ──
     public UxPlayLogLevel LogLevel;
     [MarshalAs(UnmanagedType.U1)] public bool CoverartDisplay;
     public IntPtr CoverartFilenamePtr;
@@ -74,30 +85,48 @@ public struct UxPlayConfig : IDisposable
     public IntPtr LangPtr;
     [MarshalAs(UnmanagedType.U1)] public bool NoHold;
 
-    // Managed alloc tracking
-    IntPtr _a0,_a1,_a2,_a3,_a4,_a5,_a6,_a7,_a8,_a9,_a10,_a11;
+    // ── New in upstream (3c876b0) ──
+    [MarshalAs(UnmanagedType.U1)] public bool TaperVolume;
+    [MarshalAs(UnmanagedType.U1)] public bool SrgbFix;
+    public double AudioLatency;
+    public int ResetTimeout;
+    [MarshalAs(UnmanagedType.U1)] public bool KeepWindow;
+    [MarshalAs(UnmanagedType.U1)] public bool ForceSoftwareDecoder;
+    public IntPtr MetadataFilenamePtr;
+    public IntPtr RecordFilenamePtr;
 
-    public string? ServerName     { get => Marshal.PtrToStringUTF8(ServerNamePtr);     set { F(ref _a0); _a0=A(value); ServerNamePtr=_a0; } }
-    public string? MacAddress     { get => Marshal.PtrToStringUTF8(MacAddressPtr);     set { F(ref _a1); _a1=A(value); MacAddressPtr=_a1; } }
-    public string? Videosink      { get => Marshal.PtrToStringUTF8(VideosinkPtr);      set { F(ref _a2); _a2=A(value); VideosinkPtr=_a2; } }
-    public string? VideosinkOptions{get => Marshal.PtrToStringUTF8(VideosinkOptionsPtr);set { F(ref _a3); _a3=A(value); VideosinkOptionsPtr=_a3; } }
-    public string? VideoDecoder   { get => Marshal.PtrToStringUTF8(VideoDecoderPtr);   set { F(ref _a4); _a4=A(value); VideoDecoderPtr=_a4; } }
-    public string? VideoConverter { get => Marshal.PtrToStringUTF8(VideoConverterPtr); set { F(ref _a5); _a5=A(value); VideoConverterPtr=_a5; } }
-    public string? VideoParser    { get => Marshal.PtrToStringUTF8(VideoParserPtr);    set { F(ref _a6); _a6=A(value); VideoParserPtr=_a6; } }
-    public string? Audiosink      { get => Marshal.PtrToStringUTF8(AudiosinkPtr);      set { F(ref _a7); _a7=A(value); AudiosinkPtr=_a7; } }
-    public string? Password       { get => Marshal.PtrToStringUTF8(PasswordPtr);       set { F(ref _a8); _a8=A(value); PasswordPtr=_a8; } }
-    public string? Keyfile        { get => Marshal.PtrToStringUTF8(KeyfilePtr);        set { F(ref _a9); _a9=A(value); KeyfilePtr=_a9; } }
-    public string? CoverartFilename{get => Marshal.PtrToStringUTF8(CoverartFilenamePtr);set{ F(ref _a10);_a10=A(value);CoverartFilenamePtr=_a10; } }
-    public string? Lang           { get => Marshal.PtrToStringUTF8(LangPtr);           set { F(ref _a11);_a11=A(value);LangPtr=_a11; } }
+    // Managed alloc tracking (12 string slots)
+    IntPtr _a0,_a1,_a2,_a3,_a4,_a5,_a6,_a7,_a8,_a9,_a10,_a11,_a12;
 
-    public void Dispose() { F(ref _a0);F(ref _a1);F(ref _a2);F(ref _a3);F(ref _a4);F(ref _a5);F(ref _a6);F(ref _a7);F(ref _a8);F(ref _a9);F(ref _a10);F(ref _a11); }
+    // ── String properties ──
+    public string? ServerName      { get => M(ServerNamePtr);      set { F(ref _a0); _a0=A(value); ServerNamePtr=_a0; } }
+    public string? MacAddress      { get => M(MacAddressPtr);      set { F(ref _a1); _a1=A(value); MacAddressPtr=_a1; } }
+    public string? Videosink       { get => M(VideosinkPtr);       set { F(ref _a2); _a2=A(value); VideosinkPtr=_a2; } }
+    public string? VideoDecoder    { get => M(VideoDecoderPtr);    set { F(ref _a3); _a3=A(value); VideoDecoderPtr=_a3; } }
+    public string? VideoConverter  { get => M(VideoConverterPtr);  set { F(ref _a4); _a4=A(value); VideoConverterPtr=_a4; } }
+    public string? VideoParser     { get => M(VideoParserPtr);     set { F(ref _a5); _a5=A(value); VideoParserPtr=_a5; } }
+    public string? Audiosink       { get => M(AudiosinkPtr);       set { F(ref _a6); _a6=A(value); AudiosinkPtr=_a6; } }
+    public string? Password        { get => M(PasswordPtr);        set { F(ref _a7); _a7=A(value); PasswordPtr=_a7; } }
+    public string? Keyfile         { get => M(KeyfilePtr);         set { F(ref _a8); _a8=A(value); KeyfilePtr=_a8; } }
+    public string? CoverartFilename { get => M(CoverartFilenamePtr);set { F(ref _a9); _a9=A(value); CoverartFilenamePtr=_a9; } }
+    public string? Lang            { get => M(LangPtr);            set { F(ref _a10);_a10=A(value);LangPtr=_a10; } }
+    public string? MetadataFilename { get => M(MetadataFilenamePtr);set { F(ref _a11);_a11=A(value);MetadataFilenamePtr=_a11; } }
+    public string? RecordFilename  { get => M(RecordFilenamePtr);  set { F(ref _a12);_a12=A(value);RecordFilenamePtr=_a12; } }
+
+    public void Dispose()
+    {
+        F(ref _a0);F(ref _a1);F(ref _a2);F(ref _a3);F(ref _a4);F(ref _a5);
+        F(ref _a6);F(ref _a7);F(ref _a8);F(ref _a9);F(ref _a10);F(ref _a11);F(ref _a12);
+    }
+
+    static string? M(IntPtr p) => Marshal.PtrToStringUTF8(p);
     static IntPtr A(string? s) { if(s is null) return IntPtr.Zero; var b=System.Text.Encoding.UTF8.GetBytes(s+'\0'); var p=Marshal.AllocHGlobal(b.Length); Marshal.Copy(b,0,p,b.Length); return p; }
     static void F(ref IntPtr p) { if(p!=IntPtr.Zero){Marshal.FreeHGlobal(p);p=IntPtr.Zero;} }
 
     // ── 增量更新：仅变更的字符串才重新分配 ──
     static void SetIfChanged(ref IntPtr field, ref IntPtr ptr, string? newVal)
     {
-        var existing = Marshal.PtrToStringUTF8(ptr);
+        var existing = M(ptr);
         if (existing == newVal) return;
         F(ref field);
         field = A(newVal);
@@ -107,7 +136,7 @@ public struct UxPlayConfig : IDisposable
     /// <summary>从 AppSettings 更新配置，仅变更的字符串才重新分配</summary>
     public void UpdateFrom(AppSettings s)
     {
-        // 值类型直接赋值（零 Marshal 开销）
+        // 值类型直接赋值
         AppendHostname = s.AppendHostname; Width = s.Width; Height = s.Height;
         RefreshRate = s.RefreshRate; MaxFps = s.MaxFps;
         VideoFlip = s.VideoFlip; Fullscreen = s.Fullscreen; H265Support = s.H265Support;
@@ -117,7 +146,11 @@ public struct UxPlayConfig : IDisposable
         AccessControl = s.AccessControl; RegistrationList = s.RegistrationList;
         LogLevel = s.LogLevel; CoverartDisplay = s.CoverartDisplay;
         HlsSupport = s.HlsSupport; NoHold = s.NoHold;
-        // 数组：struct 默认 new 时为 null，需先初始化
+        TaperVolume = s.TaperVolume; SrgbFix = s.SrgbFix;
+        AudioLatency = s.AudioLatency; ResetTimeout = s.ResetTimeout;
+        KeepWindow = s.KeepWindow; ForceSoftwareDecoder = s.ForceSoftwareDecoder;
+
+        // 数组
         TcpPorts ??= new ushort[3];
         UdpPorts ??= new ushort[3];
         if (s.TcpPorts is not null) { TcpPorts[0] = s.TcpPorts[0]; TcpPorts[1] = s.TcpPorts[1]; TcpPorts[2] = s.TcpPorts[2]; }
@@ -134,15 +167,16 @@ public struct UxPlayConfig : IDisposable
             sink = "d3d11videosink";
 
         SetIfChanged(ref _a2,  ref VideosinkPtr,        sink);
-        SetIfChanged(ref _a3,  ref VideosinkOptionsPtr,  s.VideosinkOptions);
-        SetIfChanged(ref _a4,  ref VideoDecoderPtr,      s.VideoDecoder);
-        SetIfChanged(ref _a5,  ref VideoConverterPtr,    s.VideoConverter);
-        SetIfChanged(ref _a6,  ref VideoParserPtr,       s.VideoParser);
-        SetIfChanged(ref _a7,  ref AudiosinkPtr,         s.Audiosink);
-        SetIfChanged(ref _a8,  ref PasswordPtr,          s.Password);
-        SetIfChanged(ref _a9,  ref KeyfilePtr,           s.Keyfile);
-        SetIfChanged(ref _a10, ref CoverartFilenamePtr,  s.CoverartFilename);
-        SetIfChanged(ref _a11, ref LangPtr,              s.Lang);
+        SetIfChanged(ref _a3,  ref VideoDecoderPtr,      s.VideoDecoder);
+        SetIfChanged(ref _a4,  ref VideoConverterPtr,    s.VideoConverter);
+        SetIfChanged(ref _a5,  ref VideoParserPtr,       s.VideoParser);
+        SetIfChanged(ref _a6,  ref AudiosinkPtr,         s.Audiosink);
+        SetIfChanged(ref _a7,  ref PasswordPtr,          s.Password);
+        SetIfChanged(ref _a8,  ref KeyfilePtr,           s.Keyfile);
+        SetIfChanged(ref _a9,  ref CoverartFilenamePtr,  s.CoverartFilename);
+        SetIfChanged(ref _a10, ref LangPtr,              s.Lang);
+        SetIfChanged(ref _a11, ref MetadataFilenamePtr,  s.MetadataFilename);
+        SetIfChanged(ref _a12, ref RecordFilenamePtr,    s.RecordFilename);
     }
 }
 

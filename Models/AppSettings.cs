@@ -16,7 +16,6 @@ public class AppSettings
     public ushort RefreshRate { get; set; } = 60;
     public ushort MaxFps { get; set; } = 30;
     public string Videosink { get; set; } = "autovideosink";
-    public string? VideosinkOptions { get; set; }
     public string VideoDecoder { get; set; } = "decodebin";
     public string VideoConverter { get; set; } = "videoconvert";
     public string VideoParser { get; set; } = "h264parse";
@@ -45,8 +44,16 @@ public class AppSettings
     public bool HlsSupport { get; set; }
     public string? Lang { get; set; }
     public bool NoHold { get; set; } = true;
-    public bool Overscanned { get; set; }
+    // New in upstream (3c876b0)
     public bool TaperVolume { get; set; }
+    public bool SrgbFix { get; set; } = true;
+    public double AudioLatency { get; set; }
+    public int ResetTimeout { get; set; }
+    public bool KeepWindow { get; set; }
+    public bool ForceSoftwareDecoder { get; set; }
+    public string? MetadataFilename { get; set; }
+    public string? RecordFilename { get; set; }
+    public bool Overscanned { get; set; }
     public bool RestrictClients { get; set; }
     public bool NewWindowClosing { get; set; }
     public bool ShowFpsData { get; set; }
@@ -68,7 +75,7 @@ public class AppSettings
         {
             ServerName = ServerName, MacAddress = MacAddress, AppendHostname = AppendHostname,
             Width = Width, Height = Height, RefreshRate = RefreshRate, MaxFps = MaxFps,
-            Videosink = sink, VideosinkOptions = VideosinkOptions,
+            Videosink = sink,
             VideoDecoder = VideoDecoder, VideoConverter = VideoConverter, VideoParser = VideoParser,
             VideoFlip = VideoFlip, Fullscreen = Fullscreen, H265Support = H265Support,
             VideoSync = VideoSync, Bt709Fix = Bt709Fix, UseVideo = UseVideo, NoFreeze = NoFreeze,
@@ -79,6 +86,10 @@ public class AppSettings
             RegistrationList = RegistrationList, LogLevel = LogLevel,
             CoverartDisplay = CoverartDisplay, CoverartFilename = CoverartFilename,
             HlsSupport = HlsSupport, Lang = Lang, NoHold = NoHold,
+            TaperVolume = TaperVolume, SrgbFix = SrgbFix,
+            AudioLatency = AudioLatency, ResetTimeout = ResetTimeout,
+            KeepWindow = KeepWindow, ForceSoftwareDecoder = ForceSoftwareDecoder,
+            MetadataFilename = MetadataFilename, RecordFilename = RecordFilename,
         };
     }
 
