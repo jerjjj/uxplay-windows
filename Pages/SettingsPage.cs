@@ -47,7 +47,7 @@ public class SettingsPage : Page
             desc: L10n.Get("desc.overscan"));
 
         // ── 视频 ──
-        var g3 = UI.SettingsGrid(11);
+        var g3 = UI.SettingsGrid(14);
         Tog(g3, 0, L10n.Get("label.use_video"), vm.UseVideo, v => vm.UseVideo = v,
             desc: L10n.Get("desc.use_video"));
         EditCmb(g3, 1, L10n.Get("label.video_sink"), VideoSinks, vm.Videosink, v => vm.Videosink = v,
@@ -70,9 +70,15 @@ public class SettingsPage : Page
             desc: L10n.Get("desc.bt709"));
         Tog(g3, 10, L10n.Get("label.nofreeze"), vm.NoFreeze, v => vm.NoFreeze = v,
             desc: L10n.Get("desc.nofreeze"));
+        Tog(g3, 11, L10n.Get("label.srgb"), vm.SrgbFix, v => vm.SrgbFix = v,
+            desc: L10n.Get("desc.srgb"));
+        Tog(g3, 12, L10n.Get("label.keep_window"), vm.KeepWindow, v => vm.KeepWindow = v,
+            desc: L10n.Get("desc.keep_window"));
+        Tog(g3, 13, L10n.Get("label.force_sw_decoder"), vm.ForceSoftwareDecoder, v => vm.ForceSoftwareDecoder = v,
+            desc: L10n.Get("desc.force_sw_decoder"));
 
         // ── 音频 ──
-        var g4 = UI.SettingsGrid(6);
+        var g4 = UI.SettingsGrid(8);
         Tog(g4, 0, L10n.Get("label.use_audio"), vm.UseAudio, v => vm.UseAudio = v,
             desc: L10n.Get("desc.use_audio"));
         EditCmb(g4, 1, L10n.Get("label.audio_sink"), AudioSinks, vm.Audiosink, v => vm.Audiosink = v,
@@ -85,6 +91,10 @@ public class SettingsPage : Page
             desc: L10n.Get("desc.db_low"));
         Num(g4, 5, L10n.Get("label.db_high"), vm.DbHigh, -30, 10, v => vm.DbHigh = v,
             desc: L10n.Get("desc.db_high"));
+        Num(g4, 6, L10n.Get("label.initial_volume"), vm.InitialVolume, -60, 0, v => vm.InitialVolume = v,
+            desc: L10n.Get("desc.initial_volume"));
+        Num(g4, 7, L10n.Get("label.audio_latency"), vm.AudioLatency, 0, 5.0, v => vm.AudioLatency = v,
+            desc: L10n.Get("desc.audio_latency"));
 
         // ── 网络 ──
         var g5 = UI.SettingsGrid(3);
@@ -109,7 +119,7 @@ public class SettingsPage : Page
             desc: L10n.Get("desc.restrict"));
 
         // ── 杂项 ──
-        var g7 = UI.SettingsGrid(10);
+        var g7 = UI.SettingsGrid(13);
         Cmb(g7, 0, L10n.Get("label.log_level"), vm.LogLevelOptions, vm.LogLevelIndex, v => vm.LogLevelIndex = v,
             desc: L10n.Get("desc.log_level"));
         Tog(g7, 1, L10n.Get("label.nohold"), vm.NoHold, v => vm.NoHold = v,
@@ -131,6 +141,12 @@ public class SettingsPage : Page
             { vm.LanguageIndex = v; L10n.SetLanguage(v == 0 ? "en" : "zh-CN"); });
         Cmb(g7, 9, L10n.Get("label.theme"), vm.ThemeOptions, vm.ThemeIndex, v =>
             { vm.ThemeIndex = v; L10n.SetTheme((AppTheme)v); });
+        Num(g7, 10, L10n.Get("label.reset_timeout"), vm.ResetTimeout, 0, 3600, v => vm.ResetTimeout = (int)v,
+            desc: L10n.Get("desc.reset_timeout"));
+        Txt(g7, 11, L10n.Get("label.metadata_file"), vm.MetadataFilename, v => vm.MetadataFilename = v,
+            desc: L10n.Get("desc.metadata_file"));
+        Txt(g7, 12, L10n.Get("label.record_file"), vm.RecordFilename, v => vm.RecordFilename = v,
+            desc: L10n.Get("desc.record_file"));
 
         // ── 按钮 ──
         var btnReset = UI.Btn(L10n.Get("settings.defaults")); btnReset.Command = vm.ResetDefaultsCommand;

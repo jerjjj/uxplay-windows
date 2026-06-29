@@ -21,11 +21,12 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] string _videoDecoder = "decodebin", _videoConverter = "videoconvert", _videoParser = "h264parse";
     [ObservableProperty] int _videoFlipIndex;
     [ObservableProperty] bool _fullscreen, _h265Support, _videoSync = true, _bt709Fix, _useVideo = true, _noFreeze;
+    [ObservableProperty] bool _srgbFix = true, _keepWindow, _forceSoftwareDecoder;
 
     // ── 音频 ──
     [ObservableProperty] string _audiosink = "autoaudiosink";
     [ObservableProperty] bool _audioSync, _useAudio = true, _taperVolume;
-    [ObservableProperty] double _dbLow = -30.0, _dbHigh = 0.0;
+    [ObservableProperty] double _dbLow = -30.0, _dbHigh = 0.0, _initialVolume, _audioLatency;
 
     // ── 网络 ──
     [ObservableProperty] ushort _tcpPort1, _tcpPort2, _tcpPort3;
@@ -38,7 +39,8 @@ public partial class SettingsViewModel : ObservableObject
     // ── 杂项 ──
     [ObservableProperty] int _logLevelIndex = 2;
     [ObservableProperty] bool _hlsSupport, _noHold = true, _coverartDisplay, _showFpsData, _newWindowClosing;
-    [ObservableProperty] string _coverartFilename = "", _lang = "";
+    [ObservableProperty] string _coverartFilename = "", _lang = "", _metadataFilename = "", _recordFilename = "";
+    [ObservableProperty] int _resetTimeout;
     [ObservableProperty] int _languageIndex = 1; // default zh-CN
     [ObservableProperty] int _themeIndex = 0;    // default System
 
@@ -60,8 +62,9 @@ public partial class SettingsViewModel : ObservableObject
         Videosink = s.Videosink; VideoDecoder = s.VideoDecoder; VideoConverter = s.VideoConverter; VideoParser = s.VideoParser;
         VideoFlipIndex = (int)s.VideoFlip; Fullscreen = s.Fullscreen; H265Support = s.H265Support;
         VideoSync = s.VideoSync; Bt709Fix = s.Bt709Fix; UseVideo = s.UseVideo; NoFreeze = s.NoFreeze;
+        SrgbFix = s.SrgbFix; KeepWindow = s.KeepWindow; ForceSoftwareDecoder = s.ForceSoftwareDecoder;
         Audiosink = s.Audiosink; AudioSync = s.AudioSync; UseAudio = s.UseAudio; TaperVolume = s.TaperVolume;
-        DbLow = s.DbLow; DbHigh = s.DbHigh;
+        DbLow = s.DbLow; DbHigh = s.DbHigh; InitialVolume = s.InitialVolume; AudioLatency = s.AudioLatency;
         TcpPort1 = s.TcpPorts.Length > 0 ? s.TcpPorts[0] : (ushort)0;
         TcpPort2 = s.TcpPorts.Length > 1 ? s.TcpPorts[1] : (ushort)0;
         TcpPort3 = s.TcpPorts.Length > 2 ? s.TcpPorts[2] : (ushort)0;
@@ -71,6 +74,8 @@ public partial class SettingsViewModel : ObservableObject
         HlsSupport = s.HlsSupport; NoHold = s.NoHold;
         CoverartDisplay = s.CoverartDisplay; CoverartFilename = s.CoverartFilename ?? "";
         ShowFpsData = s.ShowFpsData; NewWindowClosing = s.NewWindowClosing; Lang = s.Lang ?? "";
+        MetadataFilename = s.MetadataFilename ?? ""; RecordFilename = s.RecordFilename ?? "";
+        ResetTimeout = s.ResetTimeout;
         LanguageIndex = (s.Language == "en") ? 0 : 1;
         ThemeIndex = (int)s.Theme;
         IsDirty = false; StatusMessage = "";
@@ -89,11 +94,12 @@ public partial class SettingsViewModel : ObservableObject
         VideoFlip = (UxPlayVideoFlip)VideoFlipIndex,
         Fullscreen = Fullscreen, H265Support = H265Support, VideoSync = VideoSync,
         Bt709Fix = Bt709Fix, UseVideo = UseVideo, NoFreeze = NoFreeze,
+        SrgbFix = SrgbFix, KeepWindow = KeepWindow, ForceSoftwareDecoder = ForceSoftwareDecoder,
         Audiosink = string.IsNullOrWhiteSpace(Audiosink) ? "autoaudiosink" : Audiosink,
         AudioSync = AudioSync, UseAudio = UseAudio, TaperVolume = TaperVolume,
-        DbLow = DbLow, DbHigh = DbHigh,
+        DbLow = DbLow, DbHigh = DbHigh, InitialVolume = InitialVolume, AudioLatency = AudioLatency,
         TcpPorts = [TcpPort1, TcpPort2, TcpPort3],
-        UdpPorts = [0, 0, 0], // UDP 端口无独立 UI；原生侧 TCP/UDP 共享 -p 参数
+        UdpPorts = [0, 0, 0],
         AccessControl = (UxPlayAccessControl)AccessControlIndex,
         Password = string.IsNullOrWhiteSpace(Password) ? null : Password,
         Keyfile = string.IsNullOrWhiteSpace(Keyfile) ? null : Keyfile,
@@ -104,6 +110,9 @@ public partial class SettingsViewModel : ObservableObject
         CoverartFilename = string.IsNullOrWhiteSpace(CoverartFilename) ? null : CoverartFilename,
         ShowFpsData = ShowFpsData, NewWindowClosing = NewWindowClosing,
         Lang = string.IsNullOrWhiteSpace(Lang) ? null : Lang,
+        MetadataFilename = string.IsNullOrWhiteSpace(MetadataFilename) ? null : MetadataFilename,
+        RecordFilename = string.IsNullOrWhiteSpace(RecordFilename) ? null : RecordFilename,
+        ResetTimeout = ResetTimeout,
         Language = (LanguageIndex == 0) ? "en" : "zh-CN",
         Theme = (Services.AppTheme)ThemeIndex,
     };
@@ -118,14 +127,16 @@ public partial class SettingsViewModel : ObservableObject
         Videosink = d.Videosink; VideoDecoder = d.VideoDecoder; VideoConverter = d.VideoConverter; VideoParser = d.VideoParser;
         VideoFlipIndex = 0; Fullscreen = d.Fullscreen; H265Support = d.H265Support;
         VideoSync = d.VideoSync; Bt709Fix = d.Bt709Fix; UseVideo = d.UseVideo; NoFreeze = d.NoFreeze;
+        SrgbFix = d.SrgbFix; KeepWindow = d.KeepWindow; ForceSoftwareDecoder = d.ForceSoftwareDecoder;
         Audiosink = d.Audiosink; AudioSync = d.AudioSync; UseAudio = d.UseAudio; TaperVolume = d.TaperVolume;
-        DbLow = d.DbLow; DbHigh = d.DbHigh;
+        DbLow = d.DbLow; DbHigh = d.DbHigh; InitialVolume = d.InitialVolume; AudioLatency = d.AudioLatency;
         TcpPort1 = 0; TcpPort2 = 0; TcpPort3 = 0;
         AccessControlIndex = 0; Password = ""; Keyfile = "";
         RegistrationList = d.RegistrationList; RestrictClients = d.RestrictClients;
         LogLevelIndex = 2; HlsSupport = d.HlsSupport; NoHold = d.NoHold;
         CoverartDisplay = d.CoverartDisplay; CoverartFilename = "";
         ShowFpsData = d.ShowFpsData; NewWindowClosing = d.NewWindowClosing; Lang = "";
+        MetadataFilename = ""; RecordFilename = ""; ResetTimeout = 0;
         LanguageIndex = 1; ThemeIndex = 0;
         IsDirty = true; StatusMessage = L10n.Get("msg.settings_reset");
     }

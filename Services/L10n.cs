@@ -203,6 +203,26 @@ public static class L10n
         ["msg.stop_failed"] = "Stop failed",
         ["msg.restart_failed"] = "Restart failed",
         ["msg.settings_reset"] = "Restored default settings",
+        ["video.size"] = "Video Size",
+
+        // New upstream fields
+        ["label.srgb"] = "Full-Range Color",
+        ["label.keep_window"] = "Keep Video Window",
+        ["label.force_sw_decoder"] = "Force Software Decode",
+        ["label.initial_volume"] = "Initial Volume",
+        ["label.audio_latency"] = "Audio Latency",
+        ["label.reset_timeout"] = "Reset Timeout",
+        ["label.metadata_file"] = "Metadata File",
+        ["label.record_file"] = "Record File",
+
+        ["desc.srgb"] = "Use full [0-255] color range. Uncheck for 16-235 limited (-srgb no)",
+        ["desc.keep_window"] = "Keep video window visible after client disconnects (-nc)",
+        ["desc.force_sw_decoder"] = "Force software H.264 decoding instead of hardware acceleration (-avdec)",
+        ["desc.initial_volume"] = "Client initial volume, 0.0 = max (0 dB), negative = quieter (-vol)",
+        ["desc.audio_latency"] = "Audio latency in seconds, 0 = auto (0.25 s) (-al)",
+        ["desc.reset_timeout"] = "Auto-reset after N seconds of idle, 0 = never (-reset)",
+        ["desc.metadata_file"] = "Write audio metadata (title/artist/album) to this file (-md)",
+        ["desc.record_file"] = "Record media to MP4 file, leave empty for no recording (-mp4)",
     };
 
     static readonly Dictionary<string, string> _zh = new()
@@ -281,6 +301,8 @@ public static class L10n
         ["label.taper"] = "锥形音量",
         ["label.db_low"] = "低 dB 限",
         ["label.db_high"] = "高 dB 限",
+        ["label.initial_volume"] = "初始音量",
+        ["label.audio_latency"] = "音频延迟",
         ["label.tcp_port"] = "TCP 端口",
         ["label.access_control"] = "访问控制",
         ["label.password"] = "密码",
@@ -295,6 +317,12 @@ public static class L10n
         ["label.lang_pref"] = "语言偏好",
         ["label.show_fps"] = "显示 FPS",
         ["label.new_window"] = "新窗口关闭",
+        ["label.srgb"] = "全范围色彩",
+        ["label.keep_window"] = "保留视频窗口",
+        ["label.force_sw_decoder"] = "强制软解",
+        ["label.reset_timeout"] = "自动重置",
+        ["label.metadata_file"] = "元数据文件",
+        ["label.record_file"] = "录制文件",
         ["label.language"] = "界面语言",
         ["label.theme"] = "主题",
 
@@ -337,6 +365,14 @@ public static class L10n
         ["desc.lang_pref"] = "HLS 视频语言优先级。覆盖 $LANGUAGE 环境变量（-lang）",
         ["desc.show_fps"] = "在日志中显示客户端发送的视频流性能报告（-FPSdata）",
         ["desc.new_window"] = "客户端停止镜像时关闭视频窗口（-nc 取消此行为）",
+        ["desc.srgb"] = "使用全范围 [0-255] 色彩输出。关闭则限为 16-235（-srgb no）",
+        ["desc.keep_window"] = "客户端断开后保留视频窗口（-nc）",
+        ["desc.force_sw_decoder"] = "强制使用软件 H.264 解码，而非硬件加速（-avdec）",
+        ["desc.initial_volume"] = "客户端初始音量，0.0 = 最大（0 dB），负数 = 更轻（-vol）",
+        ["desc.audio_latency"] = "音频延迟秒数，0 = 自动（0.25 秒）（-al）",
+        ["desc.reset_timeout"] = "无客户端连接 N 秒后自动重置服务器，0 = 永不重置（-reset）",
+        ["desc.metadata_file"] = "将音频元数据（曲名/艺术家/专辑）写入此文件（-md）",
+        ["desc.record_file"] = "将媒体录制为 MP4 文件输出，留空则不录制（-mp4）",
 
         ["lang.zh-CN"] = "简体中文",
         ["lang.en"] = "English",
@@ -396,6 +432,7 @@ public static class L10n
         ["msg.stop_failed"] = "停止失败",
         ["msg.restart_failed"] = "重启失败",
         ["msg.settings_reset"] = "已恢复默认设置",
+        ["video.size"] = "视频尺寸",
     };
 
     static Dictionary<string, string> _cur = _zh;

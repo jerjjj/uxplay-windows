@@ -27,6 +27,9 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] bool _audioMetaVisible;
     [ObservableProperty] string _logText = "";
     [ObservableProperty] string _errorMessage = "";
+    [ObservableProperty] string _libVersion = "";
+    [ObservableProperty] string _videoSizeInfo = "";
+    [ObservableProperty] bool _videoSizeVisible;
 
     public ObservableCollection<string> ConnectedDevices { get; } = new();
 
@@ -53,6 +56,10 @@ public partial class MainViewModel : ObservableObject
         svc.AudioMetadata      += (_, m) => { AudioArtist = m.artist ?? ""; AudioTitle = m.title ?? ""; AudioMetaVisible = !string.IsNullOrEmpty(m.title); };
         svc.ErrorOccurred      += (_, m) => { ErrorMessage = m; Log($"[ERROR] {m}"); };
         svc.LogMessage         += (_, m) => Log(m);
+        svc.VideoSizeChanged   += (_, s) => { VideoSizeInfo = $"{s.ws:F0}x{s.hs:F0} → {s.w:F0}x{s.h:F0}"; VideoSizeVisible = true; };
+
+        // Library version
+        try { LibVersion = System.Runtime.InteropServices.Marshal.PtrToStringUTF8(UxPlayNative.uxplay_version()) ?? ""; } catch { LibVersion = "?"; }
     }
 
     // ── 状态映射（单一来源） ──

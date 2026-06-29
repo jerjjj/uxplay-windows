@@ -23,6 +23,7 @@ public sealed class UxPlayService : IDisposable
     public event EventHandler<(string? artist, string? title, string? album)>? AudioMetadata;
     public event EventHandler<string>? ErrorOccurred;
     public event EventHandler<string>? LogMessage;
+    public event EventHandler<(float ws, float hs, float w, float h)>? VideoSizeChanged;
 
     public UxPlayService(DispatcherQueue dq) => _dq = dq;
 
@@ -132,6 +133,10 @@ public sealed class UxPlayService : IDisposable
             case UxPlayEventType.Error:
                 var msg = d.ErrorMsg ?? "Unknown";
                 _dq.TryEnqueue(() => ErrorOccurred?.Invoke(this, msg));
+                break;
+            case UxPlayEventType.VideoSizeChanged:
+                var vs = d.VideoSize;
+                _dq.TryEnqueue(() => VideoSizeChanged?.Invoke(this, (vs.WidthSource, vs.HeightSource, vs.Width, vs.Height)));
                 break;
         }
     }

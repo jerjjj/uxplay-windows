@@ -19,6 +19,8 @@ public class MainPage : Page
     private readonly TextBlock _pinCodeText;
     private readonly Border _audioCard;
     private readonly TextBlock _audioTitleText, _audioArtistText;
+    private readonly Border _videoSizeCard;
+    private readonly TextBlock _videoSizeText;
     private readonly ListView _deviceList;
     private readonly TextBlock _noDeviceText;
     private readonly InfoBar _errorBar;
@@ -75,6 +77,11 @@ public class MainPage : Page
         _audioCard = UI.Card(UI.Title(L10n.Get("audio.title")), _audioTitleText, _audioArtistText);
         _audioCard.Visibility = Visibility.Collapsed;
 
+        // ── 视频尺寸 ──
+        _videoSizeText = new TextBlock { FontSize = 14, Foreground = UI.TextSecondary };
+        _videoSizeCard = UI.Card(UI.Title(L10n.Get("video.size")), _videoSizeText);
+        _videoSizeCard.Visibility = Visibility.Collapsed;
+
         // ── 设备列表 ──
         _deviceList = new ListView
         {
@@ -110,6 +117,7 @@ public class MainPage : Page
                     _pinCard,
                     _audioCard,
                     UI.Card(UI.Title(L10n.Get("devices.title")), _deviceList, _noDeviceText),
+                    _videoSizeCard,
                     _errorBar,
                 }
             }
@@ -146,6 +154,11 @@ public class MainPage : Page
         }
         if (prop is null or nameof(MainViewModel.ConnectionCount))
             _noDeviceText.Visibility = _vm.ConnectionCount == 0 ? Visibility.Visible : Visibility.Collapsed;
+        if (prop is null or nameof(MainViewModel.VideoSizeVisible) or nameof(MainViewModel.VideoSizeInfo))
+        {
+            _videoSizeCard.Visibility = _vm.VideoSizeVisible ? Visibility.Visible : Visibility.Collapsed;
+            _videoSizeText.Text = _vm.VideoSizeInfo;
+        }
         if (prop is null or nameof(MainViewModel.ErrorMessage))
         {
             var hasErr = !string.IsNullOrEmpty(_vm.ErrorMessage);
